@@ -203,4 +203,71 @@ Closures are a powerful feature in JavaScript, enabling data privacy, function f
 
 ---
 
-**Practice:** Try modifying the examples in `closures.js` and observe the results to deepen your understanding.
+## setTimeout, Closures, and Loop Pitfalls
+
+This section explains how closures interact with `setTimeout` and loops, a common source of confusion in JavaScript.
+
+### Example 1: The Problem with `var` in Loops
+```js
+function y() {
+    for (var i = 1; i <= 5; i++) {
+        setTimeout(() => {
+            console.log(i);
+        }, i * 1000);
+    }
+}
+ y();
+```
+**What happens?**
+- This will log `6` five times (after 1s, 2s, ..., 5s).
+- Why? Because `var` is function-scoped, not block-scoped. By the time the callbacks run, the loop is done and `i` is `6`.
+
+### Example 2: Fix with IIFE (Immediately Invoked Function Expression)
+```js
+function z() {
+    for (var i = 1; i <= 5; i++) {
+        (function(closeI) {
+            setTimeout(() => {
+                console.log(closeI);
+            }, closeI * 1000);
+        })(i);
+    }
+}
+ z();
+```
+**How does this work?**
+- The IIFE creates a new scope for each iteration, capturing the current value of `i` as `closeI`.
+- Each timeout callback now has its own copy of the value.
+- This logs `1, 2, 3, 4, 5` as expected.
+
+### Example 3: Fix with `let`
+```js
+function a() {
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+            console.log(i);
+        }, i * 1000);
+    }
+}
+ a();
+```
+**How does this work?**
+- `let` is block-scoped, so each iteration gets a new binding of `i`.
+- Each callback closes over its own `i` value.
+- This logs `0, 1, 2, 3, 4` as expected.
+
+### Key Concepts
+- **Closures** allow the callback to "remember" the variable from its surrounding scope.
+- With `var`, all callbacks share the same variable, leading to unexpected results in async code.
+- Use `let` or an IIFE to capture the correct value for each iteration.
+
+**Summary:**
+> When using asynchronous functions like `setTimeout` inside loops, always be mindful of variable scope. Use `let` or an IIFE to avoid common pitfalls with closures and `var`.
+
+
+---
+
+**Practice:** Try modifying the examples in `closures.js` & `setTimeOutPractice.js`  and observe the results to deepen your understanding.
+
+
+
