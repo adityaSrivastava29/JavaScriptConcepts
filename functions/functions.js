@@ -78,3 +78,49 @@ const arrowFunctionExample = () => {
 };
 
 arrowFunctionExample(); // Calling the arrow function
+
+//callback functions
+// Callback functions are functions that are passed as arguments to other functions and are executed after a certain event or condition is met.
+// They are commonly used in asynchronous programming, event handling, and functional programming patterns.
+// Example of a callback function   
+function callbackExample(callback) {
+    console.log("Executing callback function...");
+    callback(); // Calling the passed callback function
+}
+callbackExample(() => {
+    console.log("This is the callback function being executed.");
+});
+
+function xx(yy){
+ console.log("This is a function that accepts a callback yy and called in xx.");
+ yy(); // Calling the callback function passed to xx
+}
+
+xx(function yy(){
+   console.log("This is a callback function yy passed to xx.");
+});
+ 
+ let counter = 0; 
+
+// using a global variable to keep track of clicks but not recommended in production code
+// Using a global variable to keep track of clicks is not recommended in production code,
+// as it can lead to unexpected behavior and make the code harder to maintain.
+// Instead, consider using closures or state management libraries for better control over state.
+document.getElementById("clickMe")
+.addEventListener("click", function xyz() {
+    console.log("Button clicked! ", ++counter); // This is a callback function executed on button click.
+});
+
+function attachEventListener() {
+    let localCounter = 0; // Using a local variable to keep track of clicks
+    document.getElementById("clickMe2")
+    .addEventListener("click", function closureExample() {
+        console.log("Button clicked! ", ++localCounter); // This is a closure that captures the local variable.
+    });
+}
+attachEventListener();
+
+
+
+
+

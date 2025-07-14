@@ -121,6 +121,21 @@ arrowFunctionExample();
 - Cannot be used as constructors
 
 ---
+## 8. Callback Functions
+A callback function is a function passed as an argument to another function.
+They are commonly used in asynchronous programming, event handling, and functional programming patterns.
+Example of a callback function   
+
+```
+function callbackExample(callback) {
+    console.log("Executing callback function...");
+    callback(); // Calling the passed callback function
+}
+callbackExample(() => {
+    console.log("This is the callback function being executed.");
+});
+
+```
 
 ## Summary Table
 | Concept                  | Hoisted | Named | Can be Anonymous | Can be Value | Example Use Case         |
@@ -133,4 +148,3 @@ arrowFunctionExample();
 
 ---
 
-**Practice:** Try modifying the examples and see how hoisting, naming, and context affect function behavior in JavaScript.
