@@ -8,4 +8,3 @@ Welcome! Use the links below to navigate the main topics:
 
 ---
 
-For best results on GitHub Pages, this file serves as the homepage (`index.md`).
