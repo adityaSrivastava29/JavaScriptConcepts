@@ -6,8 +6,8 @@ Welcome to your comprehensive JavaScript interview notes! This repository contai
 
 ## 📚 Table of Contents
 - [Functions](functions/functions.md)
-- [Closures](Closures/README.md)
-- [Event Loop](JS%20Interview%20Question/eventloop.md)
+- [Closures](Closures/closures.md)
+- [Event Loop](JS-Interview-Questions/eventloop.md)
 - [More Topics Coming Soon!]
 
 ---

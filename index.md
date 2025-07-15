@@ -4,7 +4,7 @@ Welcome! Use the links below to navigate the main topics:
 
 - [Functions](functions/functions.md)
 - [Closures](Closures/closures.md)
-- [Event Loop](JS%20Interview%20Question/eventloop.md)
+- [Event Loop](JS-Interview-Questions/eventloop.md)
 
 ---
 
