@@ -1,10 +1,12 @@
-# JavaScript Interview Notes: Index
+# JavaScript Concepts with Code Examples and Interview Questions: 
 
-Welcome! Use the links below to navigate the main topics:
+
 
 - [Functions](functions/functions.md)
 - [Closures](Closures/closures.md)
 - [Event Loop](JS-Interview-Questions/eventloop.md)
+- [Higher Order Functions](JS-Interview-Questions/HigherOrderFunction.md)
+- [More Topics Coming Soon!]
 
 ---
 
