@@ -24,6 +24,8 @@ function multiplier(factor) {
 }
 
 const double = multiplier(2);
+console.log(double); // Output: [Function: anonymous]
+// Using the returned function  
 console.log(double(5)); // Output: 10
 
 // 2. Why use Higher Order Functions?
