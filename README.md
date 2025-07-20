@@ -10,7 +10,7 @@ Welcome to your comprehensive JavaScript interview notes! This repository contai
 - [Event Loop](JS-Interview-Questions/eventloop.md)
 - [Higher Order Functions](JS-Interview-Questions/HigherOrderFunction.md)
 - [Map, Reduce, Filter](JS-Interview-Questions/map-reduce-filters.md)
-- [Polyfills](HigherOrderFunction/Polyfills.html)
+- [Polyfills](HigherOrderFunction/polyfills.html)
 
 - [More Topics Coming Soon!]
 
@@ -40,7 +40,7 @@ Welcome to your comprehensive JavaScript interview notes! This repository contai
 - [Event Loop](JS%20Interview%20Questions/eventloop.md)
 - [Higher Order Functions](JS-Interview-Questions/HigherOrderFunction.md)
 - [Map, Reduce, Filter](JS-Interview-Questions/map-reduce-filters.md)
-- [Polyfills](HigherOrderFunction/Polyfills.html)
+- [Polyfills](HigherOrderFunction/polyfills.html)
 
 ---
 
