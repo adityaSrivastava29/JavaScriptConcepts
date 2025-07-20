@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Array Polyfills</title>
+    <style>
+      body {
+        font-family: "Monaco", "Menlo", monospace;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #1a1a1a;
+        color: #e0e0e0;
+        line-height: 1.6;
+      }
+
+      .container {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 30px;
+        margin-bottom: 30px;
+      }
+      .method-section {
+        background: #2a2a2a;
+        padding: 20px;
+        border-radius: 10px;
+        border-left: 4px solid #4caf50;
+      }
+
+      .method-section h2 {
+        color: #4caf50;
+        margin-top: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .code-block {
+        background: #1e1e1e;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        overflow-x: auto;
+        border: 1px solid #333;
+      }
+
+      .code-block pre {
+        margin: 0;
+        color: #f8f8f2;
+      }
+
+      .keyword {
+        color: #ff79c6;
+      }
+
+      .function {
+        color: #50fa7b;
+      }
+
+      .string {
+        color: #f1fa8c;
+      }
+
+      .comment {
+        color: #6272a4;
+      }
+
+      .number {
+        color: #bd93f9;
+      }
+
+      .test-section {
+        background: #2a2a2a;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        grid-column: 1 / -1;
+      }
+
+      .test-section h2 {
+        color: #ff6b6b;
+        margin-top: 0;
+      }
+
+      button {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 5px;
+        font-family: inherit;
+      }
+
+      button:hover {
+        background: #45a049;
+      }
+
+      .output {
+        background: #1e1e1e;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 15px;
+        min-height: 100px;
+        border: 1px solid #333;
+      }
+
+      .concept {
+        background: #1e3a8a;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        color: #bfdbfe;
+      }
+
+      .concept h3 {
+        color: #60a5fa;
+        margin-top: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>🚀 Array Method Polyfills: Understanding the Magic</h1>
+
+    <div class="container">
+      <!-- KEY CONCEPTS SECTION -->
+      <div class="test-section" style="border-left: 4px solid #ff6b6b">
+        <h2>🎯 Key Concepts to Remember</h2>
+
+        <div
+          style="
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+          "
+        >
+          <div class="concept">
+            <h3>1. The Pattern</h3>
+            <p>All three polyfills follow the same structure:</p>
+            <ul>
+              <li>Validate the callback function</li>
+              <li>
+                Create a result container (array for map/filter, any type for
+                reduce)
+              </li>
+              <li>Loop through the original array</li>
+              <li>Apply the callback function with proper parameters</li>
+              <li>Return the result</li>
+            </ul>
+          </div>
+
+          <div class="concept">
+            <h3>2. Important Details</h3>
+            <ul>
+              <li>
+                <strong>Sparse arrays:</strong> We check
+                <code>i in this</code> to handle arrays with missing indices
+              </li>
+              <li>
+                <strong>thisArg parameter:</strong> We use
+                <code>callback.call(thisArg, ...)</code> to set the
+                <code>this</code> context
+              </li>
+              <li>
+                <strong>Callback parameters:</strong> Each method passes
+                different parameters:
+                <ul>
+                  <li>map/filter: <code>(element, index, array)</code></li>
+                  <li>
+                    reduce: <code>(accumulator, element, index, array)</code>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+
+          <div class="concept">
+            <h3>3. The Mental Models</h3>
+            <ul>
+              <li>
+                <strong>Map:</strong> Transform each item → Same length,
+                different values
+              </li>
+              <li>
+                <strong>Filter:</strong> Keep some items → Shorter or same
+                length, same values
+              </li>
+              <li>
+                <strong>Reduce:</strong> Combine all items → Single result of
+                any type
+              </li>
+            </ul>
+          </div>
+
+          <div class="concept">
+            <h3>4. Why This Matters</h3>
+            <p>Understanding polyfills helps you:</p>
+            <ul>
+              <li>Debug issues with these methods</li>
+              <li>Understand performance implications</li>
+              <li>Write more efficient code</li>
+              <li>Handle edge cases better</li>
+              <li>Appreciate what the browser does for you!</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- MAP POLYFILL -->
+      <div class="method-section">
+        <h2>🗺️ Array.prototype.map</h2>
+
+        <div class="concept">
+          <h3>Concept:</h3>
+          <p>
+            Map creates a NEW array by transforming each element using a
+            callback function. It's like having a factory that processes each
+            item and outputs a modified version.
+          </p>
+        </div>
+
+        <div class="code-block">
+          <pre><code><span class="comment">// Our custom map polyfill</span>
+<span class="keyword">Array.prototype.</span><span class="function">myMap</span> = <span class="keyword">function</span>(<span class="function">callback</span>, <span class="function">thisArg</span>) {
+    <span class="comment">// Check if callback is a function</span>
+    <span class="keyword">if</span> (<span class="keyword">typeof</span> callback !== <span class="string">'function'</span>) {
+        <span class="keyword">throw new</span> TypeError(callback + <span class="string">' is not a function'</span>);
+    }
+    
+    <span class="comment">// Create new array to store results</span>
+    <span class="keyword">const</span> result = [];
+    
+    <span class="comment">// Loop through each element</span>
+    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i < <span class="keyword">this</span>.length; i++) {
+        <span class="comment">// Check if index exists (sparse arrays)</span>
+        <span class="keyword">if</span> (i <span class="keyword">in</span> <span class="keyword">this</span>) {
+            <span class="comment">// Call callback with: element, index, array</span>
+            result[i] = callback.call(thisArg, <span class="keyword">this</span>[i], i, <span class="keyword">this</span>);
+        }
+    }
+    
+    <span class="keyword">return</span> result;
+};</code></pre>
+        </div>
+      </div>
+
+      <!-- FILTER POLYFILL -->
+      <div class="method-section">
+        <h2>🔍 Array.prototype.filter</h2>
+
+        <div class="concept">
+          <h3>Concept:</h3>
+          <p>
+            Filter creates a NEW array containing only elements that pass a
+            test. Think of it as a bouncer that only lets certain items through
+            based on your criteria.
+          </p>
+        </div>
+
+        <div class="code-block">
+          <pre><code><span class="comment">// Our custom filter polyfill</span>
+<span class="keyword">Array.prototype.</span><span class="function">myFilter</span> = <span class="keyword">function</span>(<span class="function">callback</span>, <span class="function">thisArg</span>) {
+    <span class="comment">// Check if callback is a function</span>
+    <span class="keyword">if</span> (<span class="keyword">typeof</span> callback !== <span class="string">'function'</span>) {
+        <span class="keyword">throw new</span> TypeError(callback + <span class="string">' is not a function'</span>);
+    }
+    
+    <span class="comment">// Create new array for filtered results</span>
+    <span class="keyword">const</span> result = [];
+    
+    <span class="comment">// Loop through each element</span>
+    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i < <span class="keyword">this</span>.length; i++) {
+        <span class="comment">// Check if index exists</span>
+        <span class="keyword">if</span> (i <span class="keyword">in</span> <span class="keyword">this</span>) {
+            <span class="comment">// Test element with callback</span>
+            <span class="keyword">if</span> (callback.call(thisArg, <span class="keyword">this</span>[i], i, <span class="keyword">this</span>)) {
+                <span class="comment">// Only add if test passes</span>
+                result.push(<span class="keyword">this</span>[i]);
+            }
+        }
+    }
+    
+    <span class="keyword">return</span> result;
+};</code></pre>
+        </div>
+      </div>
+
+      <!-- REDUCE POLYFILL -->
+      <div class="method-section">
+        <h2>⚡ Array.prototype.reduce</h2>
+
+        <div class="concept">
+          <h3>Concept:</h3>
+          <p>
+            Reduce takes an array and "reduces" it to a single value by applying
+            a function that combines elements. Like a snowball rolling downhill,
+            gathering more snow (data) as it goes.
+          </p>
+        </div>
+
+        <div class="code-block">
+          <pre><code><span class="comment">// Our custom reduce polyfill</span>
+<span class="keyword">Array.prototype.</span><span class="function">myReduce</span> = <span class="keyword">function</span>(<span class="function">callback</span>, <span class="function">initialValue</span>) {
+    <span class="comment">// Check if callback is a function</span>
+    <span class="keyword">if</span> (<span class="keyword">typeof</span> callback !== <span class="string">'function'</span>) {
+        <span class="keyword">throw new</span> TypeError(callback + <span class="string">' is not a function'</span>);
+    }
+    
+    <span class="comment">// Handle empty arrays</span>
+    <span class="keyword">if</span> (<span class="keyword">this</span>.length === <span class="number">0</span> && arguments.length < <span class="number">2</span>) {
+        <span class="keyword">throw new</span> TypeError(<span class="string">'Reduce of empty array with no initial value'</span>);
+    }
+    
+    <span class="keyword">let</span> accumulator;
+    <span class="keyword">let</span> startIndex = <span class="number">0</span>;
+    
+    <span class="comment">// Set up initial values</span>
+    <span class="keyword">if</span> (arguments.length >= <span class="number">2</span>) {
+        accumulator = initialValue;
+    } <span class="keyword">else</span> {
+        <span class="comment">// Find first valid element as initial value</span>
+        <span class="keyword">while</span> (startIndex < <span class="keyword">this</span>.length && !(startIndex <span class="keyword">in</span> <span class="keyword">this</span>)) {
+            startIndex++;
+        }
+        accumulator = <span class="keyword">this</span>[startIndex];
+        startIndex++;
+    }
+    
+    <span class="comment">// Process each element</span>
+    <span class="keyword">for</span> (<span class="keyword">let</span> i = startIndex; i < <span class="keyword">this</span>.length; i++) {
+        <span class="keyword">if</span> (i <span class="keyword">in</span> <span class="keyword">this</span>) {
+            <span class="comment">// Call callback with: accumulator, element, index, array</span>
+            accumulator = callback(accumulator, <span class="keyword">this</span>[i], i, <span class="keyword">this</span>);
+        }
+    }
+    
+    <span class="keyword">return</span> accumulator;
+};</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDITABLE POLYFILLS SECTION -->
+    <div class="test-section" style="border-left: 4px solid #ffd700">
+      <h2>✏️ Edit & Test Your Own Polyfills</h2>
+      <p>Modify the polyfills below and test your changes instantly!</p>
+
+      <div
+        style="
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 15px;
+          margin-bottom: 20px;
+        "
+      >
+        <div>
+          <h3 style="color: #4caf50; margin-bottom: 10px">Map Polyfill</h3>
+          <textarea
+            id="mapPolyfill"
+            style="
+              width: 100%;
+              height: 200px;
+              background: #1e1e1e;
+              color: #f8f8f2;
+              border: 1px solid #333;
+              border-radius: 5px;
+              padding: 10px;
+              font-family: Monaco, monospace;
+              font-size: 12px;
+              resize: vertical;
+            "
+          >
+Array.prototype.myMap = function(callback, thisArg) {
+    if (typeof callback !== 'function') {
+        throw new TypeError(callback + ' is not a function');
+    }
+    
+    const result = [];
+    
+    for (let i = 0; i < this.length; i++) {
+        if (i in this) {
+            result[i] = callback.call(thisArg, this[i], i, this);
+        }
+    }
+    
+    return result;
+};</textarea
+          >
+        </div>
+
+        <div>
+          <h3 style="color: #4caf50; margin-bottom: 10px">Filter Polyfill</h3>
+          <textarea
+            id="filterPolyfill"
+            style="
+              width: 100%;
+              height: 200px;
+              background: #1e1e1e;
+              color: #f8f8f2;
+              border: 1px solid #333;
+              border-radius: 5px;
+              padding: 10px;
+              font-family: Monaco, monospace;
+              font-size: 12px;
+              resize: vertical;
+            "
+          >
+Array.prototype.myFilter = function(callback, thisArg) {
+    if (typeof callback !== 'function') {
+        throw new TypeError(callback + ' is not a function');
+    }
+    
+    const result = [];
+    
+    for (let i = 0; i < this.length; i++) {
+        if (i in this) {
+            if (callback.call(thisArg, this[i], i, this)) {
+                result.push(this[i]);
+            }
+        }
+    }
+    
+    return result;
+};</textarea
+          >
+        </div>
+
+        <div>
+          <h3 style="color: #4caf50; margin-bottom: 10px">Reduce Polyfill</h3>
+          <textarea
+            id="reducePolyfill"
+            style="
+              width: 100%;
+              height: 200px;
+              background: #1e1e1e;
+              color: #f8f8f2;
+              border: 1px solid #333;
+              border-radius: 5px;
+              padding: 10px;
+              font-family: Monaco, monospace;
+              font-size: 12px;
+              resize: vertical;
+            "
+          >
+Array.prototype.myReduce = function(callback, initialValue) {
+    if (typeof callback !== 'function') {
+        throw new TypeError(callback + ' is not a function');
+    }
+    
+    if (this.length === 0 && arguments.length < 2) {
+        throw new TypeError('Reduce of empty array with no initial value');
+    }
+    
+    let accumulator;
+    let startIndex = 0;
+    
+    if (arguments.length >= 2) {
+        accumulator = initialValue;
+    } else {
+        while (startIndex < this.length && !(startIndex in this)) {
+            startIndex++;
+        }
+        accumulator = this[startIndex];
+        startIndex++;
+    }
+    
+    for (let i = startIndex; i < this.length; i++) {
+        if (i in this) {
+            accumulator = callback(accumulator, this[i], i, this);
+        }
+    }
+    
+    return accumulator;
+};</textarea
+          >
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 20px">
+        <button
+          onclick="updatePolyfills()"
+          style="background: #ffd700; color: #1a1a1a; font-weight: bold"
+        >
+          🔄 Update Polyfills
+        </button>
+        <button onclick="resetPolyfills()" style="background: #ff6b6b">
+          ↩️ Reset to Original
+        </button>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>🧪 Interactive Testing Ground</h2>
+      <p>
+        Click the buttons to see our polyfills in action and compare with native
+        methods!
+      </p>
+
+      <div>
+        <button onclick="testMap()">Test Map Polyfill</button>
+        <button onclick="testFilter()">Test Filter Polyfill</button>
+        <button onclick="testReduce()">Test Reduce Polyfill</button>
+        <button onclick="runAllTests()">Run All Tests</button>
+        <button onclick="clearOutput()">Clear Output</button>
+      </div>
+
+      <div class="output" id="output">
+        Click any button above to see the polyfills in action!
+      </div>
+    </div>
+
+    <script>
+      // Our polyfill implementations (same as shown above)
+      Array.prototype.myMap = function (callback, thisArg) {
+        if (typeof callback !== "function") {
+          throw new TypeError(callback + " is not a function");
+        }
+
+        const result = [];
+
+        for (let i = 0; i < this.length; i++) {
+          if (i in this) {
+            result[i] = callback.call(thisArg, this[i], i, this);
+          }
+        }
+
+        return result;
+      };
+
+      Array.prototype.myFilter = function (callback, thisArg) {
+        if (typeof callback !== "function") {
+          throw new TypeError(callback + " is not a function");
+        }
+
+        const result = [];
+
+        for (let i = 0; i < this.length; i++) {
+          if (i in this) {
+            if (callback.call(thisArg, this[i], i, this)) {
+              result.push(this[i]);
+            }
+          }
+        }
+
+        return result;
+      };
+
+      Array.prototype.myReduce = function (callback, initialValue) {
+        if (typeof callback !== "function") {
+          throw new TypeError(callback + " is not a function");
+        }
+
+        if (this.length === 0 && arguments.length < 2) {
+          throw new TypeError("Reduce of empty array with no initial value");
+        }
+
+        let accumulator;
+        let startIndex = 0;
+
+        if (arguments.length >= 2) {
+          accumulator = initialValue;
+        } else {
+          while (startIndex < this.length && !(startIndex in this)) {
+            startIndex++;
+          }
+          accumulator = this[startIndex];
+          startIndex++;
+        }
+
+        for (let i = startIndex; i < this.length; i++) {
+          if (i in this) {
+            accumulator = callback(accumulator, this[i], i, this);
+          }
+        }
+
+        return accumulator;
+      };
+
+      const output = document.getElementById("output");
+
+      function log(message) {
+        output.innerHTML += message + "<br>";
+        output.scrollTop = output.scrollHeight;
+      }
+
+      function updatePolyfills() {
+        try {
+          // Get the code from textareas
+          const mapCode = document.getElementById("mapPolyfill").value;
+          const filterCode = document.getElementById("filterPolyfill").value;
+          const reduceCode = document.getElementById("reducePolyfill").value;
+
+          // Remove existing polyfills
+          delete Array.prototype.myMap;
+          delete Array.prototype.myFilter;
+          delete Array.prototype.myReduce;
+
+          // Execute the new code
+          eval(mapCode);
+          eval(filterCode);
+          eval(reduceCode);
+
+          log(
+            '<span style="color: #ffd700; font-weight: bold;">✅ Polyfills updated successfully! Try testing them now.</span><br>'
+          );
+        } catch (error) {
+          log(
+            `<span style="color: #ff6b6b; font-weight: bold;">❌ Error updating polyfills: ${error.message}</span><br>`
+          );
+        }
+      }
+
+      function resetPolyfills() {
+        // Reset textareas to original code
+        document.getElementById(
+          "mapPolyfill"
+        ).value = `Array.prototype.myMap = function(callback, thisArg) {
+    if (typeof callback !== 'function') {
+        throw new TypeError(callback + ' is not a function');
+    }
+    
+    const result = [];
+    
+    for (let i = 0; i < this.length; i++) {
+        if (i in this) {
+            result[i] = callback.call(thisArg, this[i], i, this);
+        }
+    }
+    
+    return result;
+};`;
+
+        document.getElementById(
+          "filterPolyfill"
+        ).value = `Array.prototype.myFilter = function(callback, thisArg) {
+    if (typeof callback !== 'function') {
+        throw new TypeError(callback + ' is not a function');
+    }
+    
+    const result = [];
+    
+    for (let i = 0; i < this.length; i++) {
+        if (i in this) {
+            if (callback.call(thisArg, this[i], i, this)) {
+                result.push(this[i]);
+            }
+        }
+    }
+    
+    return result;
+};`;
+
+        document.getElementById(
+          "reducePolyfill"
+        ).value = `Array.prototype.myReduce = function(callback, initialValue) {
+    if (typeof callback !== 'function') {
+        throw new TypeError(callback + ' is not a function');
+    }
+    
+    if (this.length === 0 && arguments.length < 2) {
+        throw new TypeError('Reduce of empty array with no initial value');
+    }
+    
+    let accumulator;
+    let startIndex = 0;
+    
+    if (arguments.length >= 2) {
+        accumulator = initialValue;
+    } else {
+        while (startIndex < this.length && !(startIndex in this)) {
+            startIndex++;
+        }
+        accumulator = this[startIndex];
+        startIndex++;
+    }
+    
+    for (let i = startIndex; i < this.length; i++) {
+        if (i in this) {
+            accumulator = callback(accumulator, this[i], i, this);
+        }
+    }
+    
+    return accumulator;
+};`;
+
+        // Update the polyfills
+        updatePolyfills();
+        log(
+          '<span style="color: #4CAF50; font-weight: bold;">🔄 Polyfills reset to original code!</span><br>'
+        );
+      }
+
+      function testMap() {
+        log(
+          '<span style="color: #4CAF50; font-weight: bold;">🗺️ TESTING MAP POLYFILL:</span>'
+        );
+
+        const numbers = [1, 2, 3, 4, 5];
+        log(`Original array: [${numbers.join(", ")}]`);
+
+        // Test our polyfill
+        const ourResult = numbers.myMap((x) => x * 2);
+        log(`Our myMap(x => x * 2): [${ourResult.join(", ")}]`);
+
+        // Compare with native
+        const nativeResult = numbers.map((x) => x * 2);
+        log(`Native map(x => x * 2): [${nativeResult.join(", ")}]`);
+
+        // Test with index
+        const withIndex = numbers.myMap((x, i) => `${x}-${i}`);
+        log(
+          `With index myMap((x, i) => x + '-' + i): [${withIndex.join(", ")}]`
+        );
+
+        log("✅ Map test complete!<br><br>");
+      }
+
+      function testFilter() {
+        log(
+          '<span style="color: #4CAF50; font-weight: bold;">🔍 TESTING FILTER POLYFILL:</span>'
+        );
+
+        const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        log(`Original array: [${numbers.join(", ")}]`);
+
+        // Test our polyfill
+        const ourResult = numbers.myFilter((x) => x % 2 === 0);
+        log(`Our myFilter(x => x % 2 === 0): [${ourResult.join(", ")}]`);
+
+        // Compare with native
+        const nativeResult = numbers.filter((x) => x % 2 === 0);
+        log(`Native filter(x => x % 2 === 0): [${nativeResult.join(", ")}]`);
+
+        // Test with strings
+        const words = ["apple", "banana", "cherry", "date"];
+        const longWords = words.myFilter((word) => word.length > 5);
+        log(`Filter long words: [${longWords.join(", ")}]`);
+
+        log("✅ Filter test complete!<br><br>");
+      }
+
+      function testReduce() {
+        log(
+          '<span style="color: #4CAF50; font-weight: bold;">⚡ TESTING REDUCE POLYFILL:</span>'
+        );
+
+        const numbers = [1, 2, 3, 4, 5];
+        log(`Original array: [${numbers.join(", ")}]`);
+
+        // Test sum
+        const sum = numbers.myReduce((acc, curr) => acc + curr, 0);
+        log(`Sum myReduce((acc, curr) => acc + curr, 0): ${sum}`);
+
+        // Test without initial value
+        const sumNoInit = numbers.myReduce((acc, curr) => acc + curr);
+        log(`Sum without initial: ${sumNoInit}`);
+
+        // Test product
+        const product = numbers.myReduce((acc, curr) => acc * curr, 1);
+        log(`Product: ${product}`);
+
+        // Test building an object
+        const words = ["hello", "world", "test"];
+        const wordLengths = words.myReduce((acc, word) => {
+          acc[word] = word.length;
+          return acc;
+        }, {});
+        log(`Word lengths object: ${JSON.stringify(wordLengths)}`);
+
+        log("✅ Reduce test complete!<br><br>");
+      }
+
+      function runAllTests() {
+        clearOutput();
+        log(
+          '<span style="color: #ff6b6b; font-weight: bold;">🚀 RUNNING ALL TESTS:</span><br>'
+        );
+        testMap();
+        testFilter();
+        testReduce();
+        log(
+          '<span style="color: #4CAF50; font-weight: bold;">🎉 ALL TESTS COMPLETED!</span>'
+        );
+      }
+
+      function clearOutput() {
+        output.innerHTML = "";
+      }
+
+      // Run a quick demo on load
+      setTimeout(() => {
+        log("Welcome! Click the buttons above to test our polyfills.");
+        log(
+          "Each polyfill recreates the exact behavior of the native methods."
+        );
+      }, 500);
+    </script>
+  </body>
+</html>

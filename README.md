@@ -9,6 +9,9 @@ Welcome to your comprehensive JavaScript interview notes! This repository contai
 - [Closures](Closures/closures.md)
 - [Event Loop](JS-Interview-Questions/eventloop.md)
 - [Higher Order Functions](JS-Interview-Questions/HigherOrderFunction.md)
+- [Map, Reduce, Filter](JS-Interview-Questions/map-reduce-filters.md)
+- [Polyfills](HigherOrderFunction/Polyfills.html)
+
 - [More Topics Coming Soon!]
 
 ---
@@ -17,6 +20,10 @@ Welcome to your comprehensive JavaScript interview notes! This repository contai
 - **Functions:** Function statements, expressions, anonymous/named functions, arrow functions, first-class functions, arguments vs parameters, and more.
 - **Closures:** Deep dive into closures, interview Q&A, practical use-cases, memory leaks, and common pitfalls.
 - **Event Loop:** Complete guide to the JS event loop, call stack, microtasks/macrotasks, code outputs, and best practices.
+- **Higher Order Functions:** Explanation, examples, passing functions as arguments, returning functions, and built-in HOFs like `map`, `filter`, and `reduce`.
+- **Map, Reduce, Filter:** Detailed explanations, polyfills, key concepts, and mental models for understanding these powerful array methods.
+- **Polyfills:** What they are, why they matter, and how to implement polyfills for `map`, `filter`, and `reduce`.
+
 
 ---
 
@@ -31,6 +38,9 @@ Welcome to your comprehensive JavaScript interview notes! This repository contai
 - [Functions](functions/functions.md)
 - [Closures](Closures/README.md)
 - [Event Loop](JS%20Interview%20Questions/eventloop.md)
+- [Higher Order Functions](JS-Interview-Questions/HigherOrderFunction.md)
+- [Map, Reduce, Filter](JS-Interview-Questions/map-reduce-filters.md)
+- [Polyfills](HigherOrderFunction/Polyfills.html)
 
 ---
 
