@@ -1,6 +1,5 @@
 # JavaScript Concepts with Code Examples and Interview Questions:
 
-Welcome! Use the links below to navigate the main topics:
 
 ## 📚 Table of Contents
 - [Functions](functions/functions.md)
