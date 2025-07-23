@@ -11,7 +11,7 @@ Welcome to your comprehensive JavaScript interview notes! This repository contai
 - [Higher Order Functions](JS-Interview-Questions/HigherOrderFunction.md)
 - [Map, Reduce, Filter](JS-Interview-Questions/map-reduce-filters.md)
 - [Polyfills](HigherOrderFunction/polyfills.html)
-
+- [Promises](promises/promises.md)
 - [More Topics Coming Soon!]
 
 ---
@@ -41,6 +41,7 @@ Welcome to your comprehensive JavaScript interview notes! This repository contai
 - [Higher Order Functions](JS-Interview-Questions/HigherOrderFunction.md)
 - [Map, Reduce, Filter](JS-Interview-Questions/map-reduce-filters.md)
 - [Polyfills](HigherOrderFunction/polyfills.html)
+- [Promises](promises/promises.md)
 
 ---
 
