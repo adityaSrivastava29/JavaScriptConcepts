@@ -138,13 +138,12 @@ callbackExample(() => {
 ```
 
 ## Summary Table
-| Concept                  | Hoisted | Named | Can be Anonymous | Can be Value | Example Use Case         |
-|--------------------------|---------|-------|------------------|--------------|-------------------------|
-| Function Statement       | Yes     | Yes   | No               | No           | Declarations            |
-| Function Expression      | No      | Yes/No| Yes              | Yes          | Callbacks, assignments  |
-| Anonymous Function       | No      | No    | Yes              | Yes          | Callbacks, IIFE         |
-| Named Function Expression| No      | Yes   | No               | Yes          | Recursion, debugging    |
-| Arrow Function           | No      | No    | Yes              | Yes          | Callbacks, short syntax |
 
----
+| Concept                  | Hoisted | Named  | Can be Anonymous | Can be Value | Example Use Case         |
+|-------------------------|:-------:|:------:|:----------------:|:------------:|:-----------------------:|
+| Function Statement       |   Yes   |  Yes   |        No        |      No      | Declarations            |
+| Function Expression      |   No    | Yes/No |       Yes        |     Yes      | Callbacks, assignments  |
+| Anonymous Function       |   No    |   No   |       Yes        |     Yes      | Callbacks, IIFE         |
+| Named Function Expression|   No    |  Yes   |        No        |     Yes      | Recursion, debugging    |
+| Arrow Function           |   No    |   No   |       Yes        |     Yes      | Callbacks, short syntax |
 
