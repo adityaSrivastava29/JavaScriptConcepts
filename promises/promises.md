@@ -198,62 +198,196 @@ fetch(githubUserInfoURL)
 - Each `.then()` returns a new promise, allowing you to chain further operations.
 - If any promise in the chain is rejected, control jumps to the nearest `.catch()`.
 - This pattern is useful for running async operations in sequence.
-
 ---
 
-## Promise Methods
-### 1. Promise.resolve()
-Creates a promise that is resolved with a given value.
-```js
-Promise.resolve('Hello').then(console.log); // 'Hello'
+# Promise API 
+
+The `Promise` class provides 6 static methods for handling multiple promises efficiently.
+
+## 1. Promise.all(promises)
+
+**Purpose**: Execute promises in parallel, wait for ALL to complete  
+**Behavior**: Resolves when all promises resolve, rejects if ANY promise rejects  
+**Result**: Array of results in same order as input promises
+
+`NOTE` : Please note that the order of the resulting array members is the same as in its source promises. Even though the first promise takes the longest time to resolve, it’s still first in the array of results.
+
+```javascript
+Promise.all([
+  new Promise(resolve => setTimeout(() => resolve(1), 3000)),
+  new Promise(resolve => setTimeout(() => resolve(2), 2000)),
+  new Promise(resolve => setTimeout(() => resolve(3), 1000))
+]).then(console.log); // [1, 2, 3] after 3 seconds
+
+// Real-world example: Multiple API calls
+let urls = ['api/user1', 'api/user2', 'api/user3'];
+let requests = urls.map(url => fetch(url));
+Promise.all(requests).then(responses => {
+  // All requests completed successfully
+});
 ```
 
-### 2. Promise.reject()
-Creates a promise that is rejected with a given reason.
-```js
-Promise.reject('Error!').catch(console.error); // 'Error!'
-```
+**Key Points**:
+- Fails fast: if one rejects, entire operation fails
+- Non-promise values passed through as-is
+- Maintains order regardless of completion time
+- Other promises continue executing but results ignored on failure
 
-### 3. Promise.all()
-Waits for all promises to resolve (or any to reject).
-```js
-const p1 = Promise.resolve(1);
-const p2 = Promise.resolve(2);
-Promise.all([p1, p2]).then(values => console.log(values)); // [1, 2]
-```
+## 2. Promise.allSettled(promises)
 
-### 4. Promise.race()
-Resolves or rejects as soon as one of the promises does.
-```js
-const p1 = new Promise(res => setTimeout(() => res('First'), 100));
-const p2 = new Promise(res => setTimeout(() => res('Second'), 200));
-Promise.race([p1, p2]).then(console.log); // 'First'
-```
+**Purpose**: Wait for ALL promises to complete, regardless of outcome  
+**Behavior**: Never rejects, always waits for all promises to settle  
+**Result**: Array of objects with `{status, value/reason}`
 
-### 5. Promise.allSettled()
-Waits for all promises to settle (resolve or reject).
-```js
-const p1 = Promise.resolve('Success');
-const p2 = Promise.reject('Fail');
-Promise.allSettled([p1, p2]).then(results => console.log(results));
-```
-
----
-
-## Error Handling
-Always use `.catch()` to handle errors in promise chains.
-```js
-fetch('invalid-url')
-  .then(response => response.json())
-  .catch(error => {
-    console.error('Fetch failed:', error);
+```javascript
+Promise.allSettled([
+  fetch('https://api.github.com/users/validuser'),
+  fetch('https://invalid-url'),
+  Promise.resolve('direct value')
+]).then(results => {
+  results.forEach((result, index) => {
+    if (result.status === 'fulfilled') {
+      console.log(`Success: ${result.value}`);
+    } else {
+      console.log(`Failed: ${result.reason}`);
+    }
   });
+});
 ```
-**Explanation:**
+
+**Result Format**:
+- Success: `{status: "fulfilled", value: result}`
+- Failure: `{status: "rejected", reason: error}`
+
+**Polyfill** (for older browsers):
+```javascript
+if (!Promise.allSettled) {
+  Promise.allSettled = function(promises) {
+    return Promise.all(promises.map(p => 
+      Promise.resolve(p).then(
+        value => ({status: 'fulfilled', value}),
+        reason => ({status: 'rejected', reason})
+      )
+    ));
+  };
+}
+```
+
+## 3. Promise.race(promises)
+
+**Purpose**: Get result of the FIRST promise to settle (resolve OR reject)  
+**Behavior**: Resolves/rejects with first settled promise  
+**Result**: Single value from the fastest promise
+
+```javascript
+Promise.race([
+  new Promise(resolve => setTimeout(() => resolve('slow'), 3000)),
+  new Promise(resolve => setTimeout(() => resolve('fast'), 1000)),
+  new Promise((_, reject) => setTimeout(() => reject('error'), 2000))
+]).then(console.log); // 'fast' (after 1 second)
+```
+
+**Use Cases**:
+- Implementing timeouts
+- Getting fastest response from multiple sources
+- Circuit breaker patterns
+
+## 4. Promise.any(promises)
+
+**Purpose**: Get result of the FIRST promise to FULFILL (ignores rejections)  
+**Behavior**: Resolves with first successful promise, rejects only if ALL fail  
+**Result**: Single value from first successful promise, or AggregateError
+
+```javascript
+Promise.any([
+  new Promise((_, reject) => setTimeout(() => reject('Error 1'), 1000)),
+  new Promise(resolve => setTimeout(() => resolve('Success!'), 2000)),
+  new Promise(resolve => setTimeout(() => resolve('Also success'), 3000))
+]).then(console.log); // 'Success!' (after 2 seconds)
+
+// All fail scenario
+Promise.any([
+  Promise.reject('Error 1'),
+  Promise.reject('Error 2')
+]).catch(error => {
+  console.log(error.constructor.name); // AggregateError
+  console.log(error.errors); // ['Error 1', 'Error 2']
+});
+```
+
+## 5. Promise.resolve(value)
+
+**Purpose**: Create an immediately resolved promise  
+**Use Case**: Ensure consistent promise interface
+
+```javascript
+// These are equivalent
+Promise.resolve(42);
+new Promise(resolve => resolve(42));
+
+// Practical example: Caching with consistent API
+let cache = new Map();
+function loadCached(url) {
+  if (cache.has(url)) {
+    return Promise.resolve(cache.get(url)); // Always return promise
+  }
+  return fetch(url).then(response => {
+    cache.set(url, response);
+    return response;
+  });
+}
+```
+
+## 6. Promise.reject(error)
+
+**Purpose**: Create an immediately rejected promise  
+**Use Case**: Rarely used in practice (async/await preferred)
+
+```javascript
+// These are equivalent
+Promise.reject(new Error('Failed'));
+new Promise((_, reject) => reject(new Error('Failed')));
+```
+
+## Quick Comparison
+
+| Method | Waits For | Resolves When | Rejects When |
+|--------|-----------|---------------|--------------|
+| `all` | All to settle | All resolve | Any rejects |
+| `allSettled` | All to settle | Always (never rejects) | Never |
+| `race` | First to settle | First resolves | First rejects |
+| `any` | First to fulfill | First resolves | All reject |
+
+## Best Practices
+
+1. **Use `Promise.all`** for parallel operations where you need all results
+2. **Use `Promise.allSettled`** when you want all results regardless of failures
+3. **Use `Promise.race`** for timeout implementations or fastest-wins scenarios
+4. **Use `Promise.any`** when you need the first successful result
+5. **`Promise.all` is most commonly used** in real applications
+6. **Consider error handling** - `Promise.all` fails fast, others have different behaviors
+
+## Error Handling Patterns
+Always use `.catch()` to handle errors in promise chains.
 - If any error occurs in the chain, `.catch()` will handle it.
 - You can also use `.finally()` to run code regardless of success or failure.
+```javascript
+// Pattern 1: Fail fast with Promise.all
+Promise.all([api1(), api2(), api3()])
+  .then(results => console.log('All succeeded:', results))
+  .catch(error => console.log('At least one failed:', error));
+
+// Pattern 2: Handle partial failures with Promise.allSettled
+Promise.allSettled([api1(), api2(), api3()])
+  .then(results => {
+    const successful = results.filter(r => r.status === 'fulfilled');
+    const failed = results.filter(r => r.status === 'rejected');
+    console.log(`${successful.length} succeeded, ${failed.length} failed`);
+  });
+```
 
 ---
+
 
 ## Async/Await (Promise Syntax Sugar)
 Async/await makes working with promises easier and more readable.
