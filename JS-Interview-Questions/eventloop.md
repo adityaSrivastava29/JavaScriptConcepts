@@ -18,6 +18,17 @@
 
 The **Event Loop** is the mechanism that allows JavaScript to perform non-blocking operations despite being single-threaded. It continuously monitors the call stack and queues, moving tasks from queues to the call stack when it's empty.
 
+The event loop is a process that continuously monitors both the call stack and the
+event queue and checks whether or not the call stack is empty. If the call stack is
+empty and there are pending events in the event queue, the event loop dequeues the
+event from the event queue and pushes it to the call stack. The call stack executes
+the event, and any additional events generated during the execution are added to
+the end of the event queue.
+Note: The event loop allows Node.js to perform non-blocking I/O operations, even
+though JavaScript is single-threaded, by offloading operations to the system kernel
+whenever possible. Since most modern kernels are multi-threaded, they can handle
+multiple operations executing in the background
+
 ### Key Points:
 - JavaScript is **single-threaded** but can handle **asynchronous operations**
 - Event Loop enables **non-blocking behavior**
@@ -28,6 +39,26 @@ The **Event Loop** is the mechanism that allows JavaScript to perform non-blocki
 ## Call Stack
 
 The **Call Stack** is a LIFO (Last In, First Out) data structure that keeps track of function calls.
+
+Call Stack is a data structure for javascript interpreters to keep track of function
+calls(creates execution context) in the program. It has two major actions,
+1. Whenever you call a function for its execution, you are pushing it to the stack.
+2. Whenever the execution is completed, the function is popped out of the stack.
+Let’s take an example and it’s state representation in a diagram format
+function hungry() {
+eatFruits();
+}
+function eatFruits() {
+return "I'm eating fruits";
+}
+// Invoke the `hungry` function
+hungry();
+The above code processed in a call stack as below,
+3. Add the hungry() function to the call stack list and execute the code.
+4. Add the eatFruits() function to the call stack list and execute the code.
+5. Delete the eatFruits() function from our call stack list.
+6. Delete the hungry() function from the call stack list since there are no items
+anymore.
 
 ### How it works:
 1. When a function is called, it's pushed onto the stack
