@@ -1,5 +1,6 @@
 # JavaScript Closures: In-Depth Guide with Examples
-The concept of **closures** in JavaScript, using the code examples from `closures.js`.
+A closure is a function that has access to the parent scope, even after the parent function has closed.
+A closure is formed when a function remembers the variables fro its lexical scope even when the function is executed outside its lexical scope. 
 
 ---
 
