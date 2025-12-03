@@ -1,7 +1,9 @@
 # Promises in JavaScript
 
 ## Introduction
-Promises are a modern way to handle asynchronous operations in JavaScript. They represent a value that may be available now, later, or never. Promises help you write cleaner, more readable code compared to callbacks.
+Promises are a modern way to handle asynchronous operations in JavaScript. They were natively introduced in **ECMAScript 2015 (ES6)**. Before this, developers relied on third-party libraries like **Bluebird** and **Q**.
+
+Promises represent a value that may be available now, later, or never. They help you write cleaner, more readable code compared to callbacks.
 
 ---
 
