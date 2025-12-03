@@ -36,6 +36,7 @@ Welcome to your comprehensive JavaScript interview notes! This repository contai
 ---
 
 ## 📖 Index
+- [Arrays](Arrays/array.md)
 - [Functions](functions/functions.md)
 - [Closures](Closures/README.md)
 - [Event Loop](JS%20Interview%20Questions/eventloop.md)

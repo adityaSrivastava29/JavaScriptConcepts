@@ -2,6 +2,7 @@
 
 
 ## 📚 Table of Contents
+- [Arrays](Arrays/array.md)
 - [Functions](functions/functions.md)
 - [Closures](Closures/closures.md)
 - [Event Loop](JS-Interview-Questions/eventloop.md)

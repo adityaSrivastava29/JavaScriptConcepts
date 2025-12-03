@@ -1,3 +1,25 @@
+Arrays are one of the most fundamental data structures in JavaScript. They are used to store collections of values, and provide a variety of methods for manipulating and working with those values.
+
+declaring an array:
+```javascript
+let arr = [1, 2, 3];
+```
+
+accessing an array:
+```javascript
+let arr = [1, 2, 3];
+console.log(arr[0]); // 1
+```
+
+modifying an array:
+```javascript
+let arr = [1, 2, 3];
+arr[0] = 4;
+console.log(arr); // [4, 2, 3]
+```
+
+----------------------
+
 JavaScript array methods can be categorized into two groups:
 - Mutating methods: These are the methods that directly modify the original array.
 - Non-mutating methods: These methods return a new array without altering the
