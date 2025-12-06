@@ -26,12 +26,15 @@ JavaScript array methods can be categorized into two groups:
 original one.
 
 There are 9 methods in total that mutate the arrays, 
+
+1. `push`: Adds one or more elements to array.
 ```javascript
 let arr1 = [1, 2, 3];
 // Syntax: array.push(element1, element2, ..., elementN)
 let newLength1 = arr1.push(4, 5); // arr1 is now [1, 2, 3, 4, 5], newLength1 is 5
 ```
 the end of the array and returns the new length. 
+
 2. `pop`: Removes the last element from the
 array and returns that element. 
 ```javascript
@@ -182,6 +185,18 @@ let lastItem = arrQ.at(-1); // 44
 let arrR = ['1', '2', '3', '4', '5'];
 let rightReduced = arrR.reduceRight((acc, curr) => acc + curr); // "54321"
 ```
+
+| Mutating method	| Non-mutating alternative
+| copyWithin()	|No one-method alternative
+fill()	No one-method alternative
+pop()	slice(0, -1)
+push(v1, v2)	concat([v1, v2])
+reverse()	toReversed()
+shift()	slice(1)
+sort()	toSorted()
+splice()	toSpliced()
+unshift(v1, v2)	toSpliced(0, 0, v1, v2)
+
 
 ### Static Methods
 

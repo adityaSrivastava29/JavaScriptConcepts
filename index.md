@@ -2,7 +2,10 @@
 
 
 ## 📚 Table of Contents
+- [loops](loops/loops.md)
+- [String](string/string.md)
 - [Arrays](Arrays/array.md)
+- [JavaScript Regular Expression](string/regex.md)
 - [Functions](functions/functions.md)
 - [Closures](Closures/closures.md)
 - [Event Loop](JS-Interview-Questions/eventloop.md)
