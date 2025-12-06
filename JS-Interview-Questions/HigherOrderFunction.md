@@ -1,3 +1,5 @@
+[← Back to Home](../index.md)
+
 # Higher Order Functions in JavaScript
 
 ## What is a Higher Order Function?

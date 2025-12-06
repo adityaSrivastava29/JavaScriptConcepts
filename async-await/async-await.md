@@ -1,3 +1,5 @@
+[← Back to Home](../index.md)
+
 # JavaScript Async/Await
 
 ## Table of Contents

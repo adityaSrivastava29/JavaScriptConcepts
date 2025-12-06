@@ -1,3 +1,5 @@
+[← Back to Home](../index.md)
+
 # JavaScript Functions: Concepts and Examples
 
 

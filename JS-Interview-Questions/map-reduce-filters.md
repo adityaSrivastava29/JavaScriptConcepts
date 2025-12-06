@@ -1,3 +1,5 @@
+[← Back to Home](../index.md)
+
 # JavaScript Array Methods: map, filter, and reduce
 
 ## Introduction

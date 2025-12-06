@@ -1,3 +1,5 @@
+[← Back to Home](../index.md)
+
 Arrays are one of the most fundamental data structures in JavaScript. They are used to store collections of values, and provide a variety of methods for manipulating and working with those values.
 
 declaring an array:

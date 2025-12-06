@@ -1,3 +1,5 @@
+[← Back to Home](../index.md)
+
 # JavaScript Closures: In-Depth Guide with Examples
 A closure is a function that has access to the parent scope, even after the parent function has closed.
 A closure is formed when a function remembers the variables fro its lexical scope even when the function is executed outside its lexical scope. 

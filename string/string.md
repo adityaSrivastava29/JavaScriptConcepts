@@ -1,4 +1,6 @@
 
+[← Back to Home](../index.md)
+
 # **JavaScript Strings**
 
 JavaScript `String` is a **primitive, immutable, UTF-16 encoded sequence of code units**.

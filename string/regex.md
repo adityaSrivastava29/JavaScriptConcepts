@@ -1,3 +1,5 @@
+[← Back to Home](../index.md)
+
 # JavaScript Regular Expressions — 
 
 Covers: syntax, flags, character classes, quantifiers, groups, assertions, Unicode, APIs, performance, pitfalls, debugging, common patterns, and interview questions.
