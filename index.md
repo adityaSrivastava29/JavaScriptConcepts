@@ -5,6 +5,7 @@
 - [loops](loops/loops.md)
 - [String](string/string.md)
 - [Arrays](Arrays/array.md)
+- [Deep Copy vs Shallow Copy](DeepCopyVSShallowCopy/shallow-deep-copy.md)
 - [Sets](map-set/set.md)
 - [JavaScript Regular Expression](string/regex.md)
 - [Functions](functions/functions.md)
