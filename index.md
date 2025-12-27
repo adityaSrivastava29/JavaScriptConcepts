@@ -10,7 +10,7 @@
 - [JavaScript Regular Expression](string/regex.md)
 - [Functions](functions/functions.md)
 - [Callbacks](promises/callback.md)
-- [Closures](Closures/closures.md)
+- [Closures and Scope](Closures and Scope/closures.md)
 - [Event Loop](JS-Interview-Questions/eventloop.md)
 - [Higher Order Functions](JS-Interview-Questions/HigherOrderFunction.md)
 - [Map, Reduce, Filter](JS-Interview-Questions/map-reduce-filters.md)

@@ -6,7 +6,7 @@ Welcome to your comprehensive JavaScript interview notes! This repository contai
 
 ## 📚 Table of Contents
 - [Functions](functions/functions.md)
-- [Closures](Closures/closures.md)
+- [Closures and Scope](Closures and Scope/closures.md)
 - [Event Loop](JS-Interview-Questions/eventloop.md)
 - [Higher Order Functions](JS-Interview-Questions/HigherOrderFunction.md)
 - [Map, Reduce, Filter](JS-Interview-Questions/map-reduce-filters.md)
