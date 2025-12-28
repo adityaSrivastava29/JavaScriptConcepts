@@ -2,6 +2,7 @@
 
 
 ## 📚 Table of Contents
+- [Data Types](Data-Types/data-type.md)
 - [loops](loops/loops.md)
 - [String](string/string.md)
 - [Arrays](Arrays/array.md)
@@ -10,13 +11,14 @@
 - [JavaScript Regular Expression](string/regex.md)
 - [Functions](functions/functions.md)
 - [Callbacks](promises/callback.md)
-- [Closures and Scope](Closures and Scope/closures.md)
+- [Closures and Scope](Closures-and-Scope/closures.md)
 - [Event Loop](JS-Interview-Questions/eventloop.md)
 - [Higher Order Functions](JS-Interview-Questions/HigherOrderFunction.md)
 - [Map, Reduce, Filter](JS-Interview-Questions/map-reduce-filters.md)
 - [Polyfills](HigherOrderFunction/polyfills.html)
 - [Promises](promises/promises.md)
 - [Async/Await](async-await/async-await.md)
+- [Debouncing and Throttling](debouncing_Throttling/debouncing_throttling.md)
 - [More Topics Coming Soon!]
 
 ---
