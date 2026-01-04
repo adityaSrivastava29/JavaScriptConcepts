@@ -245,7 +245,7 @@ Understanding polyfills helps you:
 
 ---
 
-## 👉 [Polyfills in details](HigherOrderFunction/Polyfills.html)
+## 👉 [Polyfills in details](../HigherOrderFunction/polyfills.html)
 
 ## Summary
 - `map`, `filter`, and `reduce` are essential for working with arrays in JavaScript.
