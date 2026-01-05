@@ -18,8 +18,10 @@
 - [Polyfills](HigherOrderFunction/polyfills.html)
 - [Promises](promises/promises.md)
 - [Async/Await](async-await/async-await.md)
-- [Debouncing and Throttling](debouncing_Throttling/debouncing_throttling.md)
+- [Debouncing and Throttling](Debouncing_Throttling/debouncing_throttling_notes.md)
 - [More Topics Coming Soon!]
 
+-[← Back to Home](../index.md)
 ---
 
+## [Namaste React Notes](https://aditya29.notion.site/Namaste-React-260bc22ab99080d787f6d8bee9c35d8d)
