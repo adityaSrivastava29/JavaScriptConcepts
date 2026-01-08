@@ -310,6 +310,17 @@ asyncFunction();
 
 console.log("4");
 ```
+* async functions start synchronously
+* await splits execution into:
+   * sync part
+   * microtask continuation
+
+* Even an already-resolved Promise yields
+
+* Microtasks run after all synchronous code
+
+* JavaScript never pauses the thread
+
 
 **Output:**
 ```
