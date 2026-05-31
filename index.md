@@ -1,7 +1,7 @@
 # JavaScript Concepts with Code Examples and Interview Questions:
 
-
 ## 📚 Table of Contents
+
 - [Data Types](Data-Types/data-type.md)
 - [loops](loops/loops.md)
 - [String](string/string.md)
@@ -19,14 +19,11 @@
 - [Promises](promises/promises.md)
 - [Async/Await](async-await/async-await.md)
 - [Debouncing and Throttling](Debouncing_Throttling/debouncing_throttling_notes.md)
+- [Prototypes and Inheritance](Prototypes-and-Inheritance/prototypes-inheritance.md)
+- [Call, Bind, Apply](call-bind-apply/call-bind-apply.md)
 - [More Topics Coming Soon!]
 
-
 ---
-
-
-
-
 
 ## [Namaste React Notes](https://aditya29.notion.site/Namaste-Engineering-260bc22ab99080d787f6d8bee9c35d8d)
 
