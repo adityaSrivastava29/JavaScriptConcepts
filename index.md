@@ -21,6 +21,7 @@
 - [Debouncing and Throttling](Debouncing_Throttling/debouncing_throttling_notes.md)
 - [Prototypes and Inheritance](Prototypes-and-Inheritance/prototypes-inheritance.md)
 - [Call, Bind, Apply](call-bind-apply/call-bind-apply.md)
+- [Polyfill in JS](polyfill/polyfill.md)
 - [More Topics Coming Soon!]
 
 ---
