@@ -1,6 +1,6 @@
 ---
-render_with_liquid: false
 ---
+{% raw %}
 
 # 🚀 Senior Frontend Engineer / React Developer Interview Handbook
 
@@ -1313,3 +1313,5 @@ const { data } = useQuery({
 ---
 
 _End of Part 2 — Sections 6–10_
+
+{% endraw %}

@@ -1,6 +1,6 @@
 ---
-render_with_liquid: false
 ---
+{% raw %}
 
 # 🚀 Senior Frontend Engineer / React Developer Interview Handbook
 
@@ -1852,3 +1852,5 @@ Key metrics to watch:
 ---
 
 _End of Part 1 — Sections 1–5_
+
+{% endraw %}

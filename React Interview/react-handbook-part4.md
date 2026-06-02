@@ -1,6 +1,6 @@
 ---
-render_with_liquid: false
 ---
+{% raw %}
 
 # 🚀 Senior Frontend Engineer / React Developer Interview Handbook
 
@@ -1385,3 +1385,5 @@ _End of Part 4 — Sections 16–20_
 | [react-handbook-part2.md](react-handbook-part2.md) | 6–10     | State Mgmt, Router, API, Patterns, System Design    |
 | [react-handbook-part3.md](react-handbook-part3.md) | 11–15    | Machine Coding, Testing, Security, Build, Micro FE  |
 | [react-handbook-part4.md](react-handbook-part4.md) | 16–20    | NPM, Q&A, Mental Models, Checklist, FAANG Internals |
+
+{% endraw %}

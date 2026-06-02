@@ -1,6 +1,6 @@
 ---
-render_with_liquid: false
 ---
+{% raw %}
 
 # 🚀 Senior Frontend Engineer / React Developer Interview Handbook
 
@@ -1462,3 +1462,5 @@ All MFEs share the same design system version. Upgrade in one place.
 ---
 
 _End of Part 3 — Sections 11–15_
+
+{% endraw %}
