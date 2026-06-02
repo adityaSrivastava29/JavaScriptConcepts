@@ -319,7 +319,7 @@ console.log("4");
 
 * Microtasks run after all synchronous code
 
-* JavaScript never pauses the thread
+* 3JavaScript never pauses the thread
 
 
 **Output:**

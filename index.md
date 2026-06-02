@@ -32,10 +32,10 @@
 
 ## 🚀 React Interview Handbook (Senior level)
 
-- [Part 1 — Fundamentals, Core Concepts, Hooks, Fiber, Performance](React%20Interview/react-handbook-part1.md)
-- [Part 2 — State Management, Router, API Handling, Patterns, System Design](React%20Interview/react-handbook-part2.md)
-- [Part 3 — Machine Coding, Testing, Security, Build & Deploy, Micro Frontends](React%20Interview/react-handbook-part3.md)
-- [Part 4 — NPM Packages, 200+ Interview Q&A, Mental Models, Checklist, FAANG Internals](React%20Interview/react-handbook-part4.md)
+- [Part 1 — Fundamentals, Core Concepts, Hooks, Fiber, Performance](react-interview/react-handbook-part1)
+- [Part 2 — State Management, Router, API Handling, Patterns, System Design](react-interview/react-handbook-part2)
+- [Part 3 — Machine Coding, Testing, Security, Build & Deploy, Micro Frontends](react-interview/react-handbook-part3)
+- [Part 4 — NPM Packages, 200+ Interview Q&A, Mental Models, Checklist, FAANG Internals](react-interview/react-handbook-part4)
 
 ---
 
