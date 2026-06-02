@@ -1,3 +1,7 @@
+---
+layout: note
+---
+
 # Shallow Copy vs Deep Copy in JavaScript
 
 Understanding how JavaScript handles data updating is crucial when working with objects and arrays. This guide explains the differences between Shallow Copy and Deep Copy.
@@ -133,4 +137,3 @@ graph LR
 | **Memory Usage** | Low | High |
 | **Speed** | Fast | Slow |
 | **Methods** | `Object.assign`, spread | `JSON.parse/stringify`, `structuredClone` |
-

@@ -1,3 +1,7 @@
+---
+layout: note
+---
+
 # Debouncing and Throttling in JavaScript
 
 ## Introduction

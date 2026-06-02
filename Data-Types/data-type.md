@@ -1,3 +1,7 @@
+---
+layout: note
+---
+
 ## JavaScript Data Types and Type Coercion
 
 ---

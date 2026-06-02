@@ -1,3 +1,7 @@
+---
+layout: note
+---
+
 # 🧠 Tricky JavaScript Interview Questions
 
 > A comprehensive collection of tricky JS questions, output-based puzzles, and their detailed explanations.

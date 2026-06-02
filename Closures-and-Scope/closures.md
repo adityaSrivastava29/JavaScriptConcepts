@@ -1,3 +1,7 @@
+---
+layout: note
+---
+
 [← Back to Home](../index.md)
 
 # JavaScript Closures: In-Depth Guide with Examples
@@ -713,4 +717,3 @@ function bankAccount(balance) {
 
 * `balance` cannot be accessed directly
 * True privacy without classes
-

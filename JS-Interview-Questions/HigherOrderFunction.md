@@ -1,3 +1,7 @@
+---
+layout: note
+---
+
 [← Back to Home](../index.md)
 
 # Higher Order Functions in JavaScript

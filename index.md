@@ -1,32 +1,30 @@
-# JavaScript Concepts with Code Examples and Interview Questions:
-
-## 📚 Table of Contents
-
-- [Data Types](Data-Types/data-type.md)
-- [loops](loops/loops.md)
-- [String](string/string.md)
-- [Arrays](Arrays/array.md)
-- [Deep Copy vs Shallow Copy](DeepCopyVSShallowCopy/shallow-deep-copy.md)
-- [Sets](map-set/set.md)
-- [JavaScript Regular Expression](string/regex.md)
-- [Functions](functions/functions.md)
-- [Callbacks](promises/callback.md)
-- [Closures and Scope](Closures-and-Scope/closures.md)
-- [Event Loop](JS-Interview-Questions/eventloop.md)
-- [Higher Order Functions](JS-Interview-Questions/HigherOrderFunction.md)
-- [Map, Reduce, Filter](JS-Interview-Questions/map-reduce-filters.md)
-- [Polyfills](HigherOrderFunction/polyfills.html)
-- [Promises](promises/promises.md)
-- [Async/Await](async-await/async-await.md)
-- [Debouncing and Throttling](Debouncing_Throttling/debouncing_throttling_notes.md)
-- [Prototypes and Inheritance](Prototypes-and-Inheritance/prototypes-inheritance.md)
-- [Call, Bind, Apply](call-bind-apply/call-bind-apply.md)
-- [Polyfill in JS](polyfill/polyfill.md)
-- [🧠 Tricky JS Interview Questions & Output Puzzles](JS-Interview-Questions/JS-Tricky-Interview.md)
-- [JavaScript Interview Questions](JS-Interview-Questions/interview.md)
-- [More Topics Coming Soon!]
-
 ---
+layout: default
+---
+
+## 📚 JavaScript Concepts
+
+- [Data Types](Data-Types/data-type)
+- [Loops](loops/loops)
+- [String](string/string)
+- [Arrays](Arrays/array)
+- [Deep Copy vs Shallow Copy](DeepCopyVSShallowCopy/shallow-deep-copy)
+- [JavaScript Regular Expression](string/regex)
+- [Functions](functions/functions)
+- [Callbacks](promises/callback)
+- [Closures and Scope](Closures-and-Scope/closures)
+- [Event Loop](JS-Interview-Questions/eventloop)
+- [Higher Order Functions](JS-Interview-Questions/HigherOrderFunction)
+- [Map, Reduce, Filter](JS-Interview-Questions/map-reduce-filters)
+- [Polyfills](HigherOrderFunction/polyfills.html)
+- [Promises](promises/promises)
+- [Async/Await](async-await/async-await)
+- [Debouncing and Throttling](Debouncing_Throttling/debouncing_throttling_notes)
+- [Prototypes and Inheritance](Prototypes-and-Inheritance/prototypes-inheritance)
+- [Call, Bind, Apply](call-bind-apply/call-bind-apply)
+- [Polyfill in JS](polyfill/polyfill)
+- [🧠 Tricky JS Interview Questions & Output Puzzles](JS-Interview-Questions/JS-Tricky-Interview)
+- [JavaScript Interview Questions](JS-Interview-Questions/interview)
 
 ---
 
@@ -39,6 +37,7 @@
 
 ---
 
-## [Namaste React Notes](https://aditya29.notion.site/Namaste-Engineering-260bc22ab99080d787f6d8bee9c35d8d)
+## 📖 Other Resources
 
-## [Full Stack MERN INTERVIEW](/JS-Interview-Questions/interview_preparation.md)
+- [Full Stack MERN Interview Prep](JS-Interview-Questions/interview_preparation)
+- [Namaste React Notes](https://aditya29.notion.site/Namaste-Engineering-260bc22ab99080d787f6d8bee9c35d8d)

@@ -1,3 +1,7 @@
+---
+layout: note
+---
+
 [← Back to Home](../index.md)
 
 # Promises in JavaScript

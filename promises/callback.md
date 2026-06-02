@@ -1,3 +1,7 @@
+---
+layout: note
+---
+
 [← Back to Home](../index.md)
 
 # Callbacks and Callback Hell in JavaScript 🔄
@@ -374,4 +378,3 @@ Callbacks are essential for asynchronous JavaScript programming, but they can qu
 Remember: Callbacks aren't bad, but callback hell is! Use modern JavaScript features to write cleaner, more maintainable asynchronous code.
 
 ---
-

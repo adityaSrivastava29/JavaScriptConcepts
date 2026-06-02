@@ -1,4 +1,7 @@
 ---
+layout: note
+prev_url: /react-interview/react-handbook-part3
+prev_title: Part 3
 ---
 
 {% raw %}

@@ -1,3 +1,7 @@
+---
+layout: note
+---
+
 # `call`, `bind`, `apply` in JavaScript
 
 ---

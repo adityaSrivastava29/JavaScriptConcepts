@@ -1,3 +1,7 @@
+---
+layout: note
+---
+
 # JavaScript Polyfills — Complete Notes
 > A polyfill is a piece of code that provides modern JavaScript functionality in older environments that don't support it.
 

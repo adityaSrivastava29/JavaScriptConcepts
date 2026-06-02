@@ -1,3 +1,7 @@
+---
+layout: note
+---
+
 [← Back to Home](../index.md)
 
 # JavaScript Array Methods: map, filter, and reduce
@@ -251,4 +255,3 @@ Understanding polyfills helps you:
 - `map`, `filter`, and `reduce` are essential for working with arrays in JavaScript.
 - They help you write clean, readable, and functional code.
 - Polyfills show how these methods work under the hood and are useful for learning or supporting older environments.
-

@@ -1,3 +1,7 @@
+---
+layout: note
+---
+
 # Prototypes & Inheritance in JavaScript
 
 ---

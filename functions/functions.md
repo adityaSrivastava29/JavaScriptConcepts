@@ -1,3 +1,7 @@
+---
+layout: note
+---
+
 [← Back to Home](../index.md)
 
 # JavaScript Functions: Concepts and Examples
@@ -148,4 +152,3 @@ callbackExample(() => {
 | Anonymous Function       |   No    |   No   |       Yes        |     Yes      | Callbacks, IIFE         |
 | Named Function Expression|   No    |  Yes   |        No        |     Yes      | Recursion, debugging    |
 | Arrow Function           |   No    |   No   |       Yes        |     Yes      | Callbacks, short syntax |
-

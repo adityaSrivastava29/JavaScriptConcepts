@@ -1,3 +1,7 @@
+---
+layout: note
+---
+
 # JavaScript Interview Guide - Complete Reference
 
 ## 1. What is the difference between 'Pass by Value' and 'Pass by Reference'?
@@ -3278,4 +3282,3 @@ await memoizedFetch('/api/users');
 ```
 
 ---
-

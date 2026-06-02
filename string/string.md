@@ -1,3 +1,7 @@
+---
+layout: note
+---
+
 
 [← Back to Home](../index.md)
 
@@ -244,7 +248,8 @@ World
 ### **Tagged templates**
 
 ```js
-tag`line1\nline2`;
+tag`line1
+line2`;
 ```
 
 ---
@@ -256,7 +261,7 @@ tag`line1\nline2`;
 ### **`normalize(form)` — Normalizes Unicode strings.**
 
 ```js
-"\u1E9B\u0323".normalize("NFC");
+"ẛ̣".normalize("NFC");
 ```
 
 ### Surrogate pair handling

@@ -1,0 +1,70 @@
+---
+layout: default
+---
+
+<style>
+  .note-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 0 16px 0;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #e1e4e8;
+    flex-wrap: wrap;
+  }
+  .note-nav-bottom {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 0 10px 0;
+    margin-top: 40px;
+    border-top: 1px solid #e1e4e8;
+    flex-wrap: wrap;
+  }
+  .note-nav .spacer,
+  .note-nav-bottom .spacer {
+    flex: 1;
+  }
+  .nav-btn {
+    display: inline-block;
+    padding: 7px 16px;
+    border-radius: 6px;
+    border: 1px solid #d1d5da;
+    color: #0366d6;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    background: #f6f8fa;
+    white-space: nowrap;
+  }
+  .nav-btn:hover {
+    background: #e1e4e8;
+    text-decoration: none;
+    color: #0366d6;
+  }
+  .nav-btn.home {
+    background: #0366d6;
+    color: #fff;
+    border-color: #0366d6;
+  }
+  .nav-btn.home:hover {
+    background: #0256b9;
+    color: #fff;
+  }
+</style>
+
+<div class="note-nav">
+  <a href="{{ '/' | relative_url }}" class="nav-btn home">🏠 Home</a>
+  <span class="spacer"></span>
+  {% if page.prev_url %}<a href="{{ page.prev_url | relative_url }}" class="nav-btn">← {{ page.prev_title }}</a>{% endif %}
+  {% if page.next_url %}<a href="{{ page.next_url | relative_url }}" class="nav-btn">{{ page.next_title }} →</a>{% endif %}
+</div>
+
+{{ content }}
+
+<div class="note-nav-bottom">
+  <a href="{{ '/' | relative_url }}" class="nav-btn home">🏠 Back to Home</a>
+  <span class="spacer"></span>
+  {% if page.prev_url %}<a href="{{ page.prev_url | relative_url }}" class="nav-btn">← {{ page.prev_title }}</a>{% endif %}
+  {% if page.next_url %}<a href="{{ page.next_url | relative_url }}" class="nav-btn">{{ page.next_title }} →</a>{% endif %}
+</div>

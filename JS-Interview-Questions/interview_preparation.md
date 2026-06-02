@@ -1,3 +1,7 @@
+---
+layout: note
+---
+
 # Full Stack Developer MERN Interview Questions
 
 
@@ -649,7 +653,8 @@ if (cluster.isMaster) {
   // Workers share the TCP connection
   http.createServer((req, res) => {
     res.writeHead(200);
-    res.end(`Hello from worker ${process.pid}\n`);
+    res.end(`Hello from worker ${process.pid}
+`);
   }).listen(8000);
   
   console.log(`Worker ${process.pid} started`);
