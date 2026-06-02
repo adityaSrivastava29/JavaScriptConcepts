@@ -22,6 +22,8 @@
 - [Prototypes and Inheritance](Prototypes-and-Inheritance/prototypes-inheritance.md)
 - [Call, Bind, Apply](call-bind-apply/call-bind-apply.md)
 - [Polyfill in JS](polyfill/polyfill.md)
+- [🧠 Tricky JS Interview Questions & Output Puzzles](JS-Interview-Questions/JS-Tricky-Interview.md)
+- [JavaScript Interview Questions](JS-Interview-Questions/interview.md)
 - [More Topics Coming Soon!]
 
 ---

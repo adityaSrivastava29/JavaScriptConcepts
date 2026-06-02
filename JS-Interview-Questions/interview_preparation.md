@@ -1,22 +1,5 @@
 # Full Stack Developer MERN Interview Questions
 
-> **Position:** Full Stack Developer (2-4 years experience)  
-> **Tech Stack:** React.js, Node.js, MongoDB, Express.js, HTML & CSS
-
----
-
-## Candidate Profile: Aditya Kumar
-
-| Category | Details |
-|----------|---------|
-| **Experience** | 3+ years at Cognizant Technology Solutions |
-| **Education** | B.Tech in CSE (NIET, 8.4 CGPA) |
-| **Certifications** | AWS Certified Developer - Associate, AWS Cloud Practitioner, GitHub Foundations |
-| **Recognition** | Star Performer (February 2025) |
-| **Key Achievements** | 99.9% uptime, 40% faster response times, 87% deployment time reduction |
-| **Personal Projects** | AI Chat Application (Gemini API), Custom AI Persona Platform (OpenAI GPT) |
-
----
 
 ## Table of Contents
 1. [React.js Questions](#1-reactjs-questions)
