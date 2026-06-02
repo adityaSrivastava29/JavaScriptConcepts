@@ -1,4 +1,5 @@
 # 🚀 Senior Frontend Engineer / React Developer Interview Handbook
+
 ## Part 2: Sections 6–10 | State Management → Router → API → Patterns → System Design
 
 ---
@@ -33,6 +34,7 @@ Derived/Atomic state, fine-grained subscriptions
 ## 6.2 Context API
 
 ### Concept
+
 Context provides a way to pass data through the component tree without prop drilling. It is built into React — no extra library needed.
 
 ### Architecture
@@ -56,7 +58,7 @@ const UserContext = createContext(null);
 
 function useUser() {
   const ctx = useContext(UserContext);
-  if (!ctx) throw new Error('useUser must be used within UserProvider');
+  if (!ctx) throw new Error("useUser must be used within UserProvider");
   return ctx;
 }
 
@@ -79,7 +81,10 @@ function UserProvider({ children }) {
     setUser(null);
   }, []);
 
-  const value = useMemo(() => ({ user, loading, login, logout }), [user, loading, login, logout]);
+  const value = useMemo(
+    () => ({ user, loading, login, logout }),
+    [user, loading, login, logout]
+  );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
@@ -87,7 +92,11 @@ function UserProvider({ children }) {
 // 3. Usage anywhere in tree
 function NavBar() {
   const { user, logout } = useUser();
-  return <header>{user ? <button onClick={logout}>Logout</button> : <LoginLink />}</header>;
+  return (
+    <header>
+      {user ? <button onClick={logout}>Logout</button> : <LoginLink />}
+    </header>
+  );
 }
 ```
 
@@ -95,24 +104,28 @@ function NavBar() {
 
 ```jsx
 // ❌ Single context: ALL consumers re-render when ANYTHING changes
-const AppContext = createContext({ user: null, theme: 'light', sidebarOpen: false });
+const AppContext = createContext({
+  user: null,
+  theme: "light",
+  sidebarOpen: false,
+});
 
 // ✅ Split by change frequency
-const UserContext = createContext(null);     // rarely changes
-const ThemeContext = createContext('light'); // changes on toggle
-const UIContext = createContext({});         // changes frequently (sidebar, modal)
+const UserContext = createContext(null); // rarely changes
+const ThemeContext = createContext("light"); // changes on toggle
+const UIContext = createContext({}); // changes frequently (sidebar, modal)
 ```
 
 ### Context vs Redux
 
-| | Context API | Redux |
-|---|---|---|
-| Bundle size | 0KB (built-in) | ~10KB (RTK) |
-| DevTools | Basic React DevTools | Powerful Redux DevTools |
-| Middleware | No | Yes (thunk, saga) |
-| Performance | Re-renders all consumers | Selective subscriptions |
-| Boilerplate | Low | Medium (RTK reduced it) |
-| Best for | Simple/medium apps | Large apps with complex state |
+|             | Context API              | Redux                         |
+| ----------- | ------------------------ | ----------------------------- |
+| Bundle size | 0KB (built-in)           | ~10KB (RTK)                   |
+| DevTools    | Basic React DevTools     | Powerful Redux DevTools       |
+| Middleware  | No                       | Yes (thunk, saga)             |
+| Performance | Re-renders all consumers | Selective subscriptions       |
+| Boilerplate | Low                      | Medium (RTK reduced it)       |
+| Best for    | Simple/medium apps       | Large apps with complex state |
 
 ---
 
@@ -134,16 +147,16 @@ View (re-renders via useSelector)
 
 ```jsx
 // store/userSlice.js
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 // Async thunk for API calls
-export const fetchUser = createAsyncThunk('user/fetch', async (userId) => {
+export const fetchUser = createAsyncThunk("user/fetch", async (userId) => {
   const response = await api.getUser(userId);
   return response.data;
 });
 
 const userSlice = createSlice({
-  name: 'user',
+  name: "user",
   initialState: { data: null, loading: false, error: null },
   reducers: {
     logout: (state) => {
@@ -155,7 +168,9 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUser.pending, (state) => { state.loading = true; })
+      .addCase(fetchUser.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(fetchUser.fulfilled, (state, action) => {
         state.loading = false;
         state.data = action.payload;
@@ -171,8 +186,8 @@ export const { logout, updateName } = userSlice.actions;
 export default userSlice.reducer;
 
 // store/index.js
-import { configureStore } from '@reduxjs/toolkit';
-import userReducer from './userSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import userReducer from "./userSlice";
 
 export const store = configureStore({
   reducer: {
@@ -184,9 +199,11 @@ export const store = configureStore({
 // In component
 function UserProfile() {
   const dispatch = useDispatch();
-  const { data: user, loading } = useSelector(state => state.user);
+  const { data: user, loading } = useSelector((state) => state.user);
 
-  useEffect(() => { dispatch(fetchUser('123')); }, []);
+  useEffect(() => {
+    dispatch(fetchUser("123"));
+  }, []);
 
   if (loading) return <Spinner />;
   return <div>{user?.name}</div>;
@@ -199,23 +216,23 @@ function UserProfile() {
 2. **Time-travel debugging**: Immutable history allows Redux DevTools to replay state changes.
 3. **Predictability**: Pure reducers are easy to test and reason about.
 
-> RTK uses **Immer** internally — you *write* mutations but Immer produces a new immutable object behind the scenes.
+> RTK uses **Immer** internally — you _write_ mutations but Immer produces a new immutable object behind the scenes.
 
 ### RTK Query — Server State in Redux
 
 ```jsx
 // api/postsApi.js
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const postsApi = createApi({
-  reducerPath: 'postsApi',
-  baseQuery: fetchBaseQuery({ baseUrl: '/api' }),
-  tagTypes: ['Post'],
+  reducerPath: "postsApi",
+  baseQuery: fetchBaseQuery({ baseUrl: "/api" }),
+  tagTypes: ["Post"],
   endpoints: (builder) => ({
-    getPosts: builder.query({ query: () => '/posts', providesTags: ['Post'] }),
+    getPosts: builder.query({ query: () => "/posts", providesTags: ["Post"] }),
     addPost: builder.mutation({
-      query: (body) => ({ url: '/posts', method: 'POST', body }),
-      invalidatesTags: ['Post'], // auto-refetch getPosts after add
+      query: (body) => ({ url: "/posts", method: "POST", body }),
+      invalidatesTags: ["Post"], // auto-refetch getPosts after add
     }),
   }),
 });
@@ -238,28 +255,31 @@ function Posts() {
 ## 6.4 Zustand
 
 ### Concept
+
 Zustand is a minimal, fast state management library based on hooks. No boilerplate, no providers.
 
 ```jsx
-import { create } from 'zustand';
+import { create } from "zustand";
 
 // Create store
 const useStore = create((set, get) => ({
   // State
   user: null,
   cart: [],
-  
+
   // Actions
   setUser: (user) => set({ user }),
-  
-  addToCart: (item) => set((state) => ({
-    cart: [...state.cart, item]
-  })),
-  
-  removeFromCart: (id) => set((state) => ({
-    cart: state.cart.filter(i => i.id !== id)
-  })),
-  
+
+  addToCart: (item) =>
+    set((state) => ({
+      cart: [...state.cart, item],
+    })),
+
+  removeFromCart: (id) =>
+    set((state) => ({
+      cart: state.cart.filter((i) => i.id !== id),
+    })),
+
   get cartTotal() {
     return get().cart.reduce((sum, item) => sum + item.price, 0);
   },
@@ -271,7 +291,7 @@ function Cart() {
   return (
     <div>
       Total: ${cartTotal}
-      {cart.map(item => (
+      {cart.map((item) => (
         <div key={item.id}>
           {item.name}
           <button onClick={() => removeFromCart(item.id)}>Remove</button>
@@ -283,33 +303,34 @@ function Cart() {
 
 // Subscribe to only what you need — no unnecessary re-renders
 function UserName() {
-  const userName = useStore(state => state.user?.name); // only re-renders when name changes
+  const userName = useStore((state) => state.user?.name); // only re-renders when name changes
   return <span>{userName}</span>;
 }
 ```
 
 ### Zustand vs Redux
 
-| | Zustand | Redux Toolkit |
-|---|---|---|
-| Setup | Minimal | Medium |
-| Bundle size | ~1KB | ~10KB |
-| Provider | Not needed | Needed |
-| DevTools | Plugin | Built-in |
-| Middleware | Supports | Rich ecosystem |
-| TypeScript | Excellent | Excellent |
-| Best for | Small-medium apps | Large apps |
+|             | Zustand           | Redux Toolkit  |
+| ----------- | ----------------- | -------------- |
+| Setup       | Minimal           | Medium         |
+| Bundle size | ~1KB              | ~10KB          |
+| Provider    | Not needed        | Needed         |
+| DevTools    | Plugin            | Built-in       |
+| Middleware  | Supports          | Rich ecosystem |
+| TypeScript  | Excellent         | Excellent      |
+| Best for    | Small-medium apps | Large apps     |
 
 ---
 
 ## 6.5 Jotai & Recoil (Atomic State)
 
 ### Concept
+
 Atomic state management: state is split into tiny atoms. Components subscribe to only the atoms they use.
 
 ```jsx
 // Jotai
-import { atom, useAtom } from 'jotai';
+import { atom, useAtom } from "jotai";
 
 const countAtom = atom(0);
 const doubledAtom = atom((get) => get(countAtom) * 2); // derived atom
@@ -317,7 +338,12 @@ const doubledAtom = atom((get) => get(countAtom) * 2); // derived atom
 function Counter() {
   const [count, setCount] = useAtom(countAtom);
   const doubled = useAtomValue(doubledAtom);
-  return <div>{count} × 2 = {doubled} <button onClick={() => setCount(c => c + 1)}>+</button></div>;
+  return (
+    <div>
+      {count} × 2 = {doubled}{" "}
+      <button onClick={() => setCount((c) => c + 1)}>+</button>
+    </div>
+  );
 }
 ```
 
@@ -334,7 +360,14 @@ function Counter() {
 ### Basic Setup
 
 ```jsx
-import { BrowserRouter, Routes, Route, Link, useNavigate, useParams } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 
 function App() {
   return (
@@ -356,7 +389,11 @@ function App() {
 function UserProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
-  return <div>User {id} <button onClick={() => navigate(-1)}>Back</button></div>;
+  return (
+    <div>
+      User {id} <button onClick={() => navigate(-1)}>Back</button>
+    </div>
+  );
 }
 ```
 
@@ -377,11 +414,11 @@ function Dashboard() {
 
 <Routes>
   <Route path="/dashboard" element={<Dashboard />}>
-    <Route index element={<DashboardHome />} />        {/* /dashboard */}
+    <Route index element={<DashboardHome />} /> {/* /dashboard */}
     <Route path="analytics" element={<Analytics />} /> {/* /dashboard/analytics */}
-    <Route path="settings" element={<Settings />} />   {/* /dashboard/settings */}
+    <Route path="settings" element={<Settings />} /> {/* /dashboard/settings */}
   </Route>
-</Routes>
+</Routes>;
 ```
 
 ### Protected Routes
@@ -400,11 +437,14 @@ function ProtectedRoute({ children }) {
 }
 
 // Usage
-<Route path="/dashboard" element={
-  <ProtectedRoute>
-    <Dashboard />
-  </ProtectedRoute>
-} />
+<Route
+  path="/dashboard"
+  element={
+    <ProtectedRoute>
+      <Dashboard />
+    </ProtectedRoute>
+  }
+/>;
 
 // In login: redirect back
 function Login() {
@@ -413,7 +453,7 @@ function Login() {
 
   function handleLogin() {
     // ...authenticate...
-    const from = location.state?.from?.pathname || '/';
+    const from = location.state?.from?.pathname || "/";
     navigate(from, { replace: true });
   }
 }
@@ -422,8 +462,8 @@ function Login() {
 ### Lazy Loaded Routes
 
 ```jsx
-const Dashboard = React.lazy(() => import('./pages/Dashboard'));
-const Profile = React.lazy(() => import('./pages/Profile'));
+const Dashboard = React.lazy(() => import("./pages/Dashboard"));
+const Profile = React.lazy(() => import("./pages/Profile"));
 
 function App() {
   return (
@@ -441,13 +481,13 @@ function App() {
 
 ### BrowserRouter vs HashRouter
 
-| | BrowserRouter | HashRouter |
-|---|---|---|
-| URL format | `/dashboard/analytics` | `/#/dashboard/analytics` |
-| Server config | Needs server to serve `index.html` for all routes | No server config needed |
-| SEO | Better | Worse (hash part ignored by crawlers) |
-| Use case | Modern web apps | Static file hosting, legacy |
-| History API | pushState | hash change |
+|               | BrowserRouter                                     | HashRouter                            |
+| ------------- | ------------------------------------------------- | ------------------------------------- |
+| URL format    | `/dashboard/analytics`                            | `/#/dashboard/analytics`              |
+| Server config | Needs server to serve `index.html` for all routes | No server config needed               |
+| SEO           | Better                                            | Worse (hash part ignored by crawlers) |
+| Use case      | Modern web apps                                   | Static file hosting, legacy           |
+| History API   | pushState                                         | hash change                           |
 
 ---
 
@@ -461,14 +501,17 @@ function App() {
 
 ```js
 // Basic fetch
-const response = await fetch('/api/users');
+const response = await fetch("/api/users");
 if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
 const data = await response.json();
 
 // With options
-const response = await fetch('/api/users', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+const response = await fetch("/api/users", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  },
   body: JSON.stringify(payload),
   signal: abortController.signal,
 });
@@ -477,13 +520,13 @@ const response = await fetch('/api/users', {
 ### Axios
 
 ```js
-import axios from 'axios';
+import axios from "axios";
 
 // Create instance with defaults
 const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
   timeout: 10000,
-  headers: { 'Content-Type': 'application/json' },
+  headers: { "Content-Type": "application/json" },
 });
 
 // Request interceptor — add auth token
@@ -514,15 +557,15 @@ api.interceptors.response.use(
 
 ### Axios vs Fetch
 
-| | Fetch | Axios |
-|---|---|---|
-| Built-in | Yes (browser/Node 18+) | No (3rd party) |
-| Auto JSON parse | No (manual `.json()`) | Yes |
-| Interceptors | No | Yes |
-| Timeout | Manual (AbortController) | Built-in |
-| Progress | No | Yes |
-| Error for 4xx/5xx | No (check `response.ok`) | Yes (throws) |
-| Bundle size | 0KB | ~13KB |
+|                   | Fetch                    | Axios          |
+| ----------------- | ------------------------ | -------------- |
+| Built-in          | Yes (browser/Node 18+)   | No (3rd party) |
+| Auto JSON parse   | No (manual `.json()`)    | Yes            |
+| Interceptors      | No                       | Yes            |
+| Timeout           | Manual (AbortController) | Built-in       |
+| Progress          | No                       | Yes            |
+| Error for 4xx/5xx | No (check `response.ok`) | Yes (throws)   |
+| Bundle size       | 0KB                      | ~13KB          |
 
 ---
 
@@ -531,6 +574,7 @@ api.interceptors.response.use(
 ### Why React Query?
 
 **Without React Query (manual data fetching):**
+
 ```jsx
 function Users() {
   const [users, setUsers] = useState([]);
@@ -539,10 +583,16 @@ function Users() {
 
   useEffect(() => {
     setLoading(true);
-    fetch('/api/users')
-      .then(r => r.json())
-      .then(data => { setUsers(data); setLoading(false); })
-      .catch(err => { setError(err); setLoading(false); });
+    fetch("/api/users")
+      .then((r) => r.json())
+      .then((data) => {
+        setUsers(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err);
+        setLoading(false);
+      });
   }, []);
 
   // No caching — refetches on every mount
@@ -553,14 +603,19 @@ function Users() {
 ```
 
 **With React Query:**
+
 ```jsx
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 function Users() {
   // Cached, deduped, background-refetched automatically
-  const { data: users, isLoading, error } = useQuery({
-    queryKey: ['users'],
-    queryFn: () => fetch('/api/users').then(r => r.json()),
+  const {
+    data: users,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["users"],
+    queryFn: () => fetch("/api/users").then((r) => r.json()),
     staleTime: 5 * 60 * 1000, // consider fresh for 5 minutes
   });
 
@@ -577,25 +632,25 @@ function useUpdateUser() {
     mutationFn: ({ id, data }) => api.put(`/users/${id}`, data),
     onMutate: async ({ id, data }) => {
       // Cancel in-flight queries
-      await queryClient.cancelQueries({ queryKey: ['users'] });
+      await queryClient.cancelQueries({ queryKey: ["users"] });
 
       // Snapshot current data
-      const previous = queryClient.getQueryData(['users']);
+      const previous = queryClient.getQueryData(["users"]);
 
       // Optimistically update
-      queryClient.setQueryData(['users'], (old) =>
-        old.map(u => u.id === id ? { ...u, ...data } : u)
+      queryClient.setQueryData(["users"], (old) =>
+        old.map((u) => (u.id === id ? { ...u, ...data } : u))
       );
 
       return { previous }; // context for rollback
     },
     onError: (err, vars, context) => {
       // Rollback on error
-      queryClient.setQueryData(['users'], context.previous);
+      queryClient.setQueryData(["users"], context.previous);
     },
     onSettled: () => {
       // Always refetch after mutation
-      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
     },
   });
 }
@@ -603,14 +658,14 @@ function useUpdateUser() {
 
 ### Client State vs Server State
 
-| | Client State | Server State |
-|---|---|---|
-| Location | Browser memory | Remote database |
-| Examples | Theme, modal open, form | Users, products, posts |
-| Ownership | Frontend app | Backend / API |
-| Library | useState, Zustand | React Query, SWR |
-| Stale? | Always current | Can be stale |
-| Sync issues | No | Yes (cache invalidation) |
+|             | Client State            | Server State             |
+| ----------- | ----------------------- | ------------------------ |
+| Location    | Browser memory          | Remote database          |
+| Examples    | Theme, modal open, form | Users, products, posts   |
+| Ownership   | Frontend app            | Backend / API            |
+| Library     | useState, Zustand       | React Query, SWR         |
+| Stale?      | Always current          | Can be stale             |
+| Sync issues | No                      | Yes (cache invalidation) |
 
 ### React Query Features
 
@@ -626,12 +681,12 @@ function useUpdateUser() {
 ## 8.3 SWR
 
 ```jsx
-import useSWR from 'swr';
+import useSWR from "swr";
 
-const fetcher = (url) => fetch(url).then(r => r.json());
+const fetcher = (url) => fetch(url).then((r) => r.json());
 
 function Profile() {
-  const { data, error, isLoading } = useSWR('/api/user', fetcher, {
+  const { data, error, isLoading } = useSWR("/api/user", fetcher, {
     revalidateOnFocus: true,
     refreshInterval: 30000, // polling every 30s
   });
@@ -653,6 +708,7 @@ function Profile() {
 ## 9.1 Higher-Order Components (HOC)
 
 ### Concept
+
 A HOC is a function that takes a component and returns a new enhanced component.
 
 ```jsx
@@ -697,6 +753,7 @@ function withLogging(WrappedComponent, componentName) {
 ## 9.2 Render Props
 
 ### Concept
+
 A component accepts a function as a prop (`render` or `children`) and calls it to render its output. The function receives data.
 
 ```jsx
@@ -731,6 +788,7 @@ function MouseTracker({ children }) {
 ## 9.3 Compound Components
 
 ### Concept
+
 A pattern where a parent component shares implicit state with its children via Context. Children are semantically related but independently placed.
 
 ```jsx
@@ -749,9 +807,8 @@ function Option({ value, children }) {
   const { value: selected, onChange } = useContext(SelectContext);
   return (
     <div
-      className={`option ${selected === value ? 'selected' : ''}`}
-      onClick={() => onChange(value)}
-    >
+      className={`option ${selected === value ? "selected" : ""}`}
+      onClick={() => onChange(value)}>
       {children}
     </div>
   );
@@ -765,7 +822,7 @@ Select.Option = Option;
   <Select.Option value="react">React</Select.Option>
   <Select.Option value="vue">Vue</Select.Option>
   <Select.Option value="angular">Angular</Select.Option>
-</Select>
+</Select>;
 ```
 
 ### Real-World Examples
@@ -779,6 +836,7 @@ Select.Option = Option;
 ## 9.4 Provider Pattern
 
 ### Concept
+
 Wrapping a component tree with a provider that supplies dependencies/services (theme, i18n, auth) via Context.
 
 ```jsx
@@ -788,9 +846,7 @@ function AppProviders({ children }) {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <RouterProvider>
-            {children}
-          </RouterProvider>
+          <RouterProvider>{children}</RouterProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
@@ -811,6 +867,7 @@ function App() {
 ## 9.5 Headless Components
 
 ### Concept
+
 Components that provide **behavior and accessibility** but **no styling**. Consumers bring their own UI.
 
 ```jsx
@@ -820,22 +877,24 @@ function useAccordion(items) {
 
   const getItemProps = (index) => ({
     isOpen: openIndex === index,
-    toggle: () => setOpenIndex(i => i === index ? null : index),
+    toggle: () => setOpenIndex((i) => (i === index ? null : index)),
   });
 
   return { getItemProps };
 }
 
 // Libraries: Radix UI, Headless UI (Tailwind), Downshift, React Aria
-import * as Accordion from '@radix-ui/react-accordion';
+import * as Accordion from "@radix-ui/react-accordion";
 
 // Users apply their own styling
 <Accordion.Root type="single">
   <Accordion.Item value="item-1">
-    <Accordion.Trigger className="my-custom-trigger">Question</Accordion.Trigger>
+    <Accordion.Trigger className="my-custom-trigger">
+      Question
+    </Accordion.Trigger>
     <Accordion.Content className="my-custom-content">Answer</Accordion.Content>
   </Accordion.Item>
-</Accordion.Root>
+</Accordion.Root>;
 ```
 
 ---
@@ -917,6 +976,7 @@ For every system design question, follow this structure:
 ## 10.2 Design: Google Docs Frontend
 
 ### Requirements
+
 - Real-time collaborative editing
 - Rich text formatting
 - User presence (cursors)
@@ -954,16 +1014,19 @@ For every system design question, follow this structure:
 **Real-time sync:** Use **CRDT** (Conflict-free Replicated Data Types) via Yjs. CRDTs allow offline editing and automatic merge without conflicts.
 
 **State management:**
+
 - Editor content: Yjs document (distributed state)
 - UI state: Zustand (sidebar open, active toolbar, user presence)
 - User data: React Query (profile, permissions)
 
 **Performance:**
+
 - Virtual rendering for large documents
 - Only re-render affected paragraphs on edit
 - Debounce network sync (don't send every keystroke)
 
 **Offline support:**
+
 - IndexedDB persistence via `y-indexeddb`
 - Service Worker for asset caching
 - Sync when reconnected
@@ -973,6 +1036,7 @@ For every system design question, follow this structure:
 ## 10.3 Design: Instagram Feed
 
 ### Requirements
+
 - Infinite scroll feed
 - Like/comment/share
 - Stories
@@ -1083,21 +1147,23 @@ function useChatSocket(userId) {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const socket = io('/chat', { auth: { token: getToken() } });
+    const socket = io("/chat", { auth: { token: getToken() } });
 
-    socket.on('message:new', (message) => {
+    socket.on("message:new", (message) => {
       // Update React Query cache directly — no refetch needed
-      queryClient.setQueryData(
-        ['messages', message.conversationId],
-        (old) => old ? [...old, message] : [message]
+      queryClient.setQueryData(["messages", message.conversationId], (old) =>
+        old ? [...old, message] : [message]
       );
       // Update conversation preview
-      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
     });
 
-    socket.on('typing:start', ({ userId, conversationId }) => {
-      useTypingStore.setState(s => ({
-        typing: { ...s.typing, [conversationId]: [...(s.typing[conversationId] ?? []), userId] }
+    socket.on("typing:start", ({ userId, conversationId }) => {
+      useTypingStore.setState((s) => ({
+        typing: {
+          ...s.typing,
+          [conversationId]: [...(s.typing[conversationId] ?? []), userId],
+        },
       }));
     });
 
@@ -1164,12 +1230,12 @@ src/
   loading="lazy"
   decoding="async"
   style={{ backgroundImage: `url(${product.blurDataURL})` }}
-/>
+/>;
 
 // 2. Search: Debounced + React Query
 const debouncedSearch = useDebounce(searchTerm, 300);
 const { data } = useQuery({
-  queryKey: ['products', debouncedSearch, filters],
+  queryKey: ["products", debouncedSearch, filters],
   queryFn: () => searchProducts(debouncedSearch, filters),
   keepPreviousData: true, // no loading flash on filter change
 });
@@ -1179,8 +1245,8 @@ const { data } = useQuery({
 // Optimistic: update cart UI before server confirms
 
 // 4. Product page: Code split heavy components
-const ReviewSection = lazy(() => import('./ReviewSection'));
-const RelatedProducts = lazy(() => import('./RelatedProducts'));
+const ReviewSection = lazy(() => import("./ReviewSection"));
+const RelatedProducts = lazy(() => import("./RelatedProducts"));
 // Load above-fold first, defer below-fold
 ```
 
@@ -1213,13 +1279,16 @@ Dashboard
 function useDashboardFilters() {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const filters = useMemo(() => ({
-    dateRange: {
-      from: searchParams.get('from') ?? getDefaultFrom(),
-      to: searchParams.get('to') ?? getDefaultTo(),
-    },
-    segments: searchParams.getAll('segments'),
-  }), [searchParams]);
+  const filters = useMemo(
+    () => ({
+      dateRange: {
+        from: searchParams.get("from") ?? getDefaultFrom(),
+        to: searchParams.get("to") ?? getDefaultTo(),
+      },
+      segments: searchParams.getAll("segments"),
+    }),
+    [searchParams]
+  );
 
   const setFilters = useCallback((newFilters) => {
     setSearchParams(toSearchParams(newFilters), { replace: true });
@@ -1230,7 +1299,7 @@ function useDashboardFilters() {
 
 // React Query with refetch interval for live dashboards
 const { data } = useQuery({
-  queryKey: ['metrics', filters],
+  queryKey: ["metrics", filters],
   queryFn: () => fetchMetrics(filters),
   refetchInterval: 60_000, // refresh every minute
   staleTime: 30_000,
@@ -1239,4 +1308,4 @@ const { data } = useQuery({
 
 ---
 
-*End of Part 2 — Sections 6–10*
+_End of Part 2 — Sections 6–10_

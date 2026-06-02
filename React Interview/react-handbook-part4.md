@@ -1,4 +1,5 @@
 # 🚀 Senior Frontend Engineer / React Developer Interview Handbook
+
 ## Part 4: Sections 16–20 | NPM → Q&A → Mental Models → Checklist → FAANG Deep Dive
 
 ---
@@ -39,33 +40,33 @@ npm install <package>
 
 ### package.json vs package-lock.json
 
-| | package.json | package-lock.json |
-|---|---|---|
-| Written by | Developer | npm (auto-generated) |
-| Versions | Ranges (`^1.2.3`, `~1.2.3`) | Exact versions |
-| Committed | Yes | Yes |
-| Purpose | Declare intent | Lock exact dependency tree |
-| npm install with lock | Uses lock versions | — |
-| npm update | Updates within ranges, regenerates lock | — |
+|                       | package.json                            | package-lock.json          |
+| --------------------- | --------------------------------------- | -------------------------- |
+| Written by            | Developer                               | npm (auto-generated)       |
+| Versions              | Ranges (`^1.2.3`, `~1.2.3`)             | Exact versions             |
+| Committed             | Yes                                     | Yes                        |
+| Purpose               | Declare intent                          | Lock exact dependency tree |
+| npm install with lock | Uses lock versions                      | —                          |
+| npm update            | Updates within ranges, regenerates lock | —                          |
 
 ### Dependency Types
 
 ```json
 {
   "dependencies": {
-    "react": "^18.0.0"       // needed at runtime in production
+    "react": "^18.0.0" // needed at runtime in production
   },
   "devDependencies": {
-    "jest": "^29.0.0"        // only needed during development/build
+    "jest": "^29.0.0" // only needed during development/build
   },
   "peerDependencies": {
-    "react": ">=16.8.0"      // consumer must provide this — not installed by npm
+    "react": ">=16.8.0" // consumer must provide this — not installed by npm
   },
   "peerDependenciesMeta": {
     "react": { "optional": true }
   },
   "optionalDependencies": {
-    "fsevents": "^2.3.2"     // install if possible, ok if fails
+    "fsevents": "^2.3.2" // install if possible, ok if fails
   }
 }
 ```
@@ -135,9 +136,9 @@ my-react-hooks/
   "name": "@myorg/react-hooks",
   "version": "1.0.0",
   "description": "Reusable React hooks",
-  "main": "./dist/index.js",          // CommonJS entry (require)
-  "module": "./dist/index.mjs",       // ESM entry (import)  
-  "types": "./dist/index.d.ts",       // TypeScript types
+  "main": "./dist/index.js", // CommonJS entry (require)
+  "module": "./dist/index.mjs", // ESM entry (import)
+  "types": "./dist/index.d.ts", // TypeScript types
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
@@ -145,8 +146,8 @@ my-react-hooks/
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist"],                   // only these files in npm package
-  "sideEffects": false,                // enables tree shaking
+  "files": ["dist"], // only these files in npm package
+  "sideEffects": false, // enables tree shaking
   "scripts": {
     "build": "vite build",
     "test": "vitest",
@@ -173,28 +174,28 @@ my-react-hooks/
 
 ```js
 // vite.config.ts
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import { resolve } from 'path';
-import dts from 'vite-plugin-dts';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { resolve } from "path";
+import dts from "vite-plugin-dts";
 
 export default defineConfig({
   plugins: [
     react(),
-    dts({ insertTypesEntry: true }),  // generates .d.ts files
+    dts({ insertTypesEntry: true }), // generates .d.ts files
   ],
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
-      name: 'ReactHooks',
-      formats: ['es', 'cjs'],
-      fileName: (format) => `index.${format === 'es' ? 'mjs' : 'js'}`,
+      entry: resolve(__dirname, "src/index.ts"),
+      name: "ReactHooks",
+      formats: ["es", "cjs"],
+      fileName: (format) => `index.${format === "es" ? "mjs" : "js"}`,
     },
     rollupOptions: {
       // Externalize peer dependencies — don't bundle them!
-      external: ['react', 'react-dom', 'react/jsx-runtime'],
+      external: ["react", "react-dom", "react/jsx-runtime"],
       output: {
-        globals: { react: 'React', 'react-dom': 'ReactDOM' },
+        globals: { react: "React", "react-dom": "ReactDOM" },
       },
     },
   },
@@ -205,7 +206,7 @@ export default defineConfig({
 
 ```ts
 // src/useDebounce.ts
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 /**
  * Debounces a value by the specified delay.
@@ -225,9 +226,9 @@ export function useDebounce<T>(value: T, delay: number): T {
 }
 
 // src/index.ts
-export { useDebounce } from './useDebounce';
-export { useLocalStorage } from './useLocalStorage';
-export { useIntersection } from './useIntersection';
+export { useDebounce } from "./useDebounce";
+export { useLocalStorage } from "./useLocalStorage";
+export { useIntersection } from "./useIntersection";
 ```
 
 ### Step 6: .npmignore
@@ -424,7 +425,7 @@ npm install --ignore-scripts  # don't run install scripts (safer in CI)
 97. What is the difference between `BrowserRouter` and `HashRouter`?
 98. What is Next.js? How does it extend React?
 99. What is Vite? How is it different from webpack?
-100. What is TypeScript? How does it benefit React development?
+100.  What is TypeScript? How does it benefit React development?
 
 ---
 
@@ -689,8 +690,8 @@ Rule: Different type = fresh start.
 // ❌ InputField is recreated every render of Form
 function Form() {
   function InputField({ label }) {
-    const [value, setValue] = useState('');
-    return <input value={value} onChange={e => setValue(e.target.value)} />;
+    const [value, setValue] = useState("");
+    return <input value={value} onChange={(e) => setValue(e.target.value)} />;
   }
   return <InputField label="Name" />;
 }
@@ -699,8 +700,8 @@ function Form() {
 
 // ✅ Define outside
 function InputField({ label }) {
-  const [value, setValue] = useState('');
-  return <input value={value} onChange={e => setValue(e.target.value)} />;
+  const [value, setValue] = useState("");
+  return <input value={value} onChange={(e) => setValue(e.target.value)} />;
 }
 function Form() {
   return <InputField label="Name" />;
@@ -730,6 +731,7 @@ Cost: Parent render time + dep comparison (smaller than recompute)
 ```
 
 **When memo is worth it:**
+
 - Child render is expensive (big component tree, complex computations)
 - Parent re-renders frequently
 - Props are referentially stable (objects/functions memoized)
@@ -778,6 +780,7 @@ function handleSubmit() {
 
 ```markdown
 ## Performance
+
 - [ ] Core Web Vitals measured (LCP < 2.5s, INP < 200ms, CLS < 0.1)
 - [ ] Lighthouse score ≥ 90 for Performance
 - [ ] Code splitting implemented (route-based at minimum)
@@ -796,6 +799,7 @@ function handleSubmit() {
 
 ```markdown
 ## Security
+
 - [ ] No dangerouslySetInnerHTML without DOMPurify sanitization
 - [ ] All external URLs validated for safe scheme (http/https only)
 - [ ] JWT stored in memory (not localStorage)
@@ -812,6 +816,7 @@ function handleSubmit() {
 
 ```markdown
 ## Accessibility
+
 - [ ] Lighthouse Accessibility score ≥ 90
 - [ ] All form inputs have associated labels
 - [ ] Images have meaningful alt text (empty alt for decorative)
@@ -828,6 +833,7 @@ function handleSubmit() {
 
 ```markdown
 ## SEO
+
 - [ ] SSR or SSG for public-facing pages (not CSR)
 - [ ] Meaningful <title> per page (React Helmet / Next.js Head)
 - [ ] Meta description per page
@@ -843,6 +849,7 @@ function handleSubmit() {
 
 ```markdown
 ## Testing
+
 - [ ] Unit tests for all utility functions
 - [ ] Component tests for all critical UI components
 - [ ] Integration tests for key user flows
@@ -858,6 +865,7 @@ function handleSubmit() {
 
 ```markdown
 ## Deployment
+
 - [ ] CI/CD pipeline runs tests before deploy
 - [ ] Environment variables managed securely (secrets manager)
 - [ ] Build artifacts versioned (content hashes)
@@ -873,6 +881,7 @@ function handleSubmit() {
 
 ```markdown
 ## Monitoring & Observability
+
 - [ ] Error tracking configured (Sentry / Datadog RUM)
 - [ ] Performance monitoring (Datadog / New Relic / web-vitals library)
 - [ ] Real User Monitoring (RUM) for production performance
@@ -924,16 +933,16 @@ function performUnitOfWork(fiber) {
 ```
 beginWork(current, workInProgress, renderLanes):
   Based on workInProgress.tag:
-  
+
   FunctionComponent → renderWithHooks()
     → calls your function component
     → processes hooks (useState, useEffect, etc.)
     → returns React elements
     → reconcileChildren() to build child fibers
-    
+
   ClassComponent → constructClassInstance() → mountClassInstance()
     → calls render()
-    
+
   HostComponent → processUpdateQueue()
     → creates DOM element (during mount)
     → diffs props (during update)
@@ -946,7 +955,7 @@ completeWork(fiber):
   For HostComponent (div, span, etc.):
     Mount: createDOMElement() → appendAllChildren()
     Update: updateProperties() (diff and create update payload)
-    
+
   Bubbles up effects to parent fiber's effectList
 ```
 
@@ -960,10 +969,10 @@ completeWork(fiber):
 // Simplified implementation concept
 function startTransition(scope) {
   const prevTransition = ReactCurrentBatchConfig.transition;
-  
+
   // Mark: we're in a transition
   ReactCurrentBatchConfig.transition = {};
-  
+
   try {
     scope(); // run your state updates
   } finally {
@@ -1000,20 +1009,26 @@ When Promise resolves: re-renders the suspended subtree
 ```jsx
 // Suspense-compatible data source (simplified)
 function createResource(promise) {
-  let status = 'pending';
+  let status = "pending";
   let result;
 
   const suspender = promise.then(
-    (data) => { status = 'success'; result = data; },
-    (err)  => { status = 'error'; result = err; }
+    (data) => {
+      status = "success";
+      result = data;
+    },
+    (err) => {
+      status = "error";
+      result = err;
+    }
   );
 
   return {
     read() {
-      if (status === 'pending') throw suspender;    // React catches this!
-      if (status === 'error')   throw result;       // React Error Boundary catches
-      if (status === 'success') return result;      // Happy path
-    }
+      if (status === "pending") throw suspender; // React catches this!
+      if (status === "error") throw result; // React Error Boundary catches
+      if (status === "success") return result; // Happy path
+    },
   };
 }
 ```
@@ -1054,16 +1069,17 @@ async function ProductPage({ id }) {
 }
 
 // Client Component — runs on both server (initial HTML) and client
-'use client';
+("use client");
 function AddToCartButton({ productId, price }) {
   const [added, setAdded] = useState(false); // hooks ✅ (client component)
 
   return (
-    <button onClick={() => {
-      addToCart(productId);
-      setAdded(true);
-    }}>
-      {added ? '✓ Added' : `Add to Cart ($${price})`}
+    <button
+      onClick={() => {
+        addToCart(productId);
+        setAdded(true);
+      }}>
+      {added ? "✓ Added" : `Add to Cart ($${price})`}
     </button>
   );
 }
@@ -1157,13 +1173,14 @@ function TimeStamp() {
     setTime(new Date().toISOString()); // only runs client-side
   }, []);
 
-  return <span>{time ?? 'Loading...'}</span>;
+  return <span>{time ?? "Loading..."}</span>;
 }
 ```
 
 ### Partial Hydration / Progressive Hydration
 
 React 18 + Server Components support streaming and partial hydration:
+
 - Different parts of the page hydrate independently.
 - Above-fold content hydrates first (visible sooner).
 - Below-fold content hydrates lazily.
@@ -1226,7 +1243,9 @@ function LikeButton({ postId, initialLikes }) {
 // useFormStatus: get status of parent form
 function SubmitButton() {
   const { pending } = useFormStatus(); // reads from parent <form>
-  return <button disabled={pending}>{pending ? 'Submitting...' : 'Submit'}</button>;
+  return (
+    <button disabled={pending}>{pending ? "Submitting..." : "Submit"}</button>
+  );
 }
 
 // useActionState: manage state from form actions
@@ -1278,21 +1297,25 @@ function MyInput({ ref, ...props }) {
 **Framework for answering:**
 
 1. **Diagnose the problem**
+
    - Build time slow: large bundle, complex dependency graph, CI bottleneck?
    - Deployment risk: all changes in one deploy, hard to isolate issues.
    - Team coordination: merge conflicts, shared globals, unclear ownership.
 
 2. **Immediate wins (0–3 months)**
+
    - Optimize CI: parallel test execution, caching node_modules.
    - Vite migration from webpack: dev server from 2min to instant.
    - Code splitting: route-based chunks reduce main bundle.
 
 3. **Medium term (3–6 months)**
+
    - Feature-sliced design: organize by domain not by type.
    - NPM packages for shared utilities/design system.
    - Separate CI/CD for design system package.
 
 4. **Long term (6–12 months)**
+
    - Evaluate micro frontends with Module Federation.
    - Domain-based decomposition (teams own vertical slices).
    - Each MFE: own repo, own CI/CD, own deployment.
@@ -1346,15 +1369,15 @@ workLoop:
 
 ---
 
-*End of Part 4 — Sections 16–20*
+_End of Part 4 — Sections 16–20_
 
 ---
 
 ## Index of All Files
 
-| File | Sections | Topics |
-|---|---|---|
-| [react-handbook-part1.md](react-handbook-part1.md) | 1–5 | Fundamentals, Core, Hooks, Internals, Performance |
-| [react-handbook-part2.md](react-handbook-part2.md) | 6–10 | State Mgmt, Router, API, Patterns, System Design |
-| [react-handbook-part3.md](react-handbook-part3.md) | 11–15 | Machine Coding, Testing, Security, Build, Micro FE |
-| [react-handbook-part4.md](react-handbook-part4.md) | 16–20 | NPM, Q&A, Mental Models, Checklist, FAANG Internals |
+| File                                               | Sections | Topics                                              |
+| -------------------------------------------------- | -------- | --------------------------------------------------- |
+| [react-handbook-part1.md](react-handbook-part1.md) | 1–5      | Fundamentals, Core, Hooks, Internals, Performance   |
+| [react-handbook-part2.md](react-handbook-part2.md) | 6–10     | State Mgmt, Router, API, Patterns, System Design    |
+| [react-handbook-part3.md](react-handbook-part3.md) | 11–15    | Machine Coding, Testing, Security, Build, Micro FE  |
+| [react-handbook-part4.md](react-handbook-part4.md) | 16–20    | NPM, Q&A, Mental Models, Checklist, FAANG Internals |

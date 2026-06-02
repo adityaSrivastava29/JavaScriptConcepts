@@ -1,4 +1,5 @@
 # 🚀 Senior Frontend Engineer / React Developer Interview Handbook
+
 ## Part 3: Sections 11–15 | Machine Coding → Testing → Security → Build → Micro Frontends
 
 ---
@@ -10,6 +11,7 @@
 ## 11.1 Machine Coding Strategy
 
 Before coding, always:
+
 1. **Clarify requirements** (2 min) — edge cases, constraints.
 2. **Sketch component tree** (2 min) — on paper or whiteboard.
 3. **Identify state** — what changes? Where does it live?
@@ -24,43 +26,57 @@ Before coding, always:
 
 ```jsx
 // Types
-const FILTERS = { ALL: 'all', ACTIVE: 'active', COMPLETED: 'completed' };
+const FILTERS = { ALL: "all", ACTIVE: "active", COMPLETED: "completed" };
 
 // Main component
 function TodoApp() {
   const [todos, setTodos] = useState([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [filter, setFilter] = useState(FILTERS.ALL);
 
-  const addTodo = useCallback((e) => {
-    e.preventDefault();
-    const text = input.trim();
-    if (!text) return;
-    setTodos(prev => [...prev, { id: crypto.randomUUID(), text, completed: false }]);
-    setInput('');
-  }, [input]);
+  const addTodo = useCallback(
+    (e) => {
+      e.preventDefault();
+      const text = input.trim();
+      if (!text) return;
+      setTodos((prev) => [
+        ...prev,
+        { id: crypto.randomUUID(), text, completed: false },
+      ]);
+      setInput("");
+    },
+    [input]
+  );
 
   const toggleTodo = useCallback((id) => {
-    setTodos(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+    setTodos((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
+    );
   }, []);
 
   const deleteTodo = useCallback((id) => {
-    setTodos(prev => prev.filter(t => t.id !== id));
+    setTodos((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
   const clearCompleted = useCallback(() => {
-    setTodos(prev => prev.filter(t => !t.completed));
+    setTodos((prev) => prev.filter((t) => !t.completed));
   }, []);
 
   const filteredTodos = useMemo(() => {
     switch (filter) {
-      case FILTERS.ACTIVE: return todos.filter(t => !t.completed);
-      case FILTERS.COMPLETED: return todos.filter(t => t.completed);
-      default: return todos;
+      case FILTERS.ACTIVE:
+        return todos.filter((t) => !t.completed);
+      case FILTERS.COMPLETED:
+        return todos.filter((t) => t.completed);
+      default:
+        return todos;
     }
   }, [todos, filter]);
 
-  const activeCount = useMemo(() => todos.filter(t => !t.completed).length, [todos]);
+  const activeCount = useMemo(
+    () => todos.filter((t) => !t.completed).length,
+    [todos]
+  );
 
   return (
     <div className="todo-app">
@@ -68,7 +84,7 @@ function TodoApp() {
       <form onSubmit={addTodo}>
         <input
           value={input}
-          onChange={e => setInput(e.target.value)}
+          onChange={(e) => setInput(e.target.value)}
           placeholder="What needs to be done?"
           aria-label="New todo"
         />
@@ -76,7 +92,7 @@ function TodoApp() {
       </form>
 
       <ul>
-        {filteredTodos.map(todo => (
+        {filteredTodos.map((todo) => (
           <TodoItem
             key={todo.id}
             todo={todo}
@@ -100,22 +116,29 @@ function TodoApp() {
 }
 
 const TodoItem = React.memo(({ todo, onToggle, onDelete }) => (
-  <li className={todo.completed ? 'completed' : ''}>
-    <input type="checkbox" checked={todo.completed} onChange={() => onToggle(todo.id)} />
+  <li className={todo.completed ? "completed" : ""}>
+    <input
+      type="checkbox"
+      checked={todo.completed}
+      onChange={() => onToggle(todo.id)}
+    />
     <span>{todo.text}</span>
-    <button onClick={() => onDelete(todo.id)} aria-label={`Delete ${todo.text}`}>×</button>
+    <button
+      onClick={() => onDelete(todo.id)}
+      aria-label={`Delete ${todo.text}`}>
+      ×
+    </button>
   </li>
 ));
 
 const FilterBar = React.memo(({ filter, onFilter }) => (
   <div role="group" aria-label="Filter todos">
-    {Object.values(FILTERS).map(f => (
+    {Object.values(FILTERS).map((f) => (
       <button
         key={f}
-        className={filter === f ? 'active' : ''}
+        className={filter === f ? "active" : ""}
         onClick={() => onFilter(f)}
-        aria-pressed={filter === f}
-      >
+        aria-pressed={filter === f}>
         {f}
       </button>
     ))}
@@ -142,9 +165,9 @@ function InfiniteScrollList() {
     setLoading(true);
     try {
       const data = await fetchPage(page);
-      setItems(prev => [...prev, ...data.items]);
+      setItems((prev) => [...prev, ...data.items]);
       setHasMore(data.hasNextPage);
-      setPage(p => p + 1);
+      setPage((p) => p + 1);
     } finally {
       setLoading(false);
     }
@@ -153,17 +176,23 @@ function InfiniteScrollList() {
   // IntersectionObserver: trigger when loader enters viewport
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) loadMore(); },
-      { rootMargin: '200px' } // trigger 200px before reaching bottom
+      ([entry]) => {
+        if (entry.isIntersecting) loadMore();
+      },
+      { rootMargin: "200px" } // trigger 200px before reaching bottom
     );
     const current = loaderRef.current;
     if (current) observer.observe(current);
-    return () => { if (current) observer.unobserve(current); };
+    return () => {
+      if (current) observer.unobserve(current);
+    };
   }, [loadMore]);
 
   return (
     <div>
-      {items.map(item => <ItemCard key={item.id} item={item} />)}
+      {items.map((item) => (
+        <ItemCard key={item.id} item={item} />
+      ))}
       <div ref={loaderRef}>
         {loading && <Spinner />}
         {!hasMore && <p>All items loaded</p>}
@@ -181,7 +210,7 @@ function InfiniteScrollList() {
 
 ```jsx
 function SearchWithAutocomplete() {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [isOpen, setIsOpen] = useState(false);
@@ -202,12 +231,14 @@ function SearchWithAutocomplete() {
 
     setLoading(true);
     fetchSuggestions(debouncedQuery, { signal: abortRef.current.signal })
-      .then(data => {
+      .then((data) => {
         setSuggestions(data);
         setIsOpen(data.length > 0);
         setSelectedIndex(-1);
       })
-      .catch(err => { if (err.name !== 'AbortError') setSuggestions([]); })
+      .catch((err) => {
+        if (err.name !== "AbortError") setSuggestions([]);
+      })
       .finally(() => setLoading(false));
 
     return () => abortRef.current?.abort();
@@ -216,18 +247,18 @@ function SearchWithAutocomplete() {
   const handleKeyDown = (e) => {
     if (!isOpen) return;
     switch (e.key) {
-      case 'ArrowDown':
+      case "ArrowDown":
         e.preventDefault();
-        setSelectedIndex(i => Math.min(i + 1, suggestions.length - 1));
+        setSelectedIndex((i) => Math.min(i + 1, suggestions.length - 1));
         break;
-      case 'ArrowUp':
+      case "ArrowUp":
         e.preventDefault();
-        setSelectedIndex(i => Math.max(i - 1, -1));
+        setSelectedIndex((i) => Math.max(i - 1, -1));
         break;
-      case 'Enter':
+      case "Enter":
         if (selectedIndex >= 0) selectSuggestion(suggestions[selectedIndex]);
         break;
-      case 'Escape':
+      case "Escape":
         setIsOpen(false);
         setSelectedIndex(-1);
         break;
@@ -245,12 +276,14 @@ function SearchWithAutocomplete() {
     <div role="combobox" aria-expanded={isOpen} aria-haspopup="listbox">
       <input
         value={query}
-        onChange={e => setQuery(e.target.value)}
+        onChange={(e) => setQuery(e.target.value)}
         onKeyDown={handleKeyDown}
         onBlur={() => setTimeout(() => setIsOpen(false), 150)} // delay for click
         aria-autocomplete="list"
         aria-controls="suggestions-list"
-        aria-activedescendant={selectedIndex >= 0 ? `suggestion-${selectedIndex}` : undefined}
+        aria-activedescendant={
+          selectedIndex >= 0 ? `suggestion-${selectedIndex}` : undefined
+        }
       />
       {loading && <Spinner />}
       {isOpen && (
@@ -261,7 +294,7 @@ function SearchWithAutocomplete() {
               id={`suggestion-${i}`}
               role="option"
               aria-selected={i === selectedIndex}
-              className={i === selectedIndex ? 'highlighted' : ''}
+              className={i === selectedIndex ? "highlighted" : ""}
               onMouseDown={() => selectSuggestion(s)} // mousedown before blur
             >
               {highlightMatch(s.label, query)}
@@ -293,8 +326,8 @@ function Comment({ comment, depth = 0 }) {
         <span className="username">{comment.author.name}</span>
         <span className="time">{formatRelativeTime(comment.createdAt)}</span>
         {comment.replies?.length > 0 && (
-          <button onClick={() => setCollapsed(c => !c)}>
-            {collapsed ? `▶ ${comment.replies.length} replies` : '▼ collapse'}
+          <button onClick={() => setCollapsed((c) => !c)}>
+            {collapsed ? `▶ ${comment.replies.length} replies` : "▼ collapse"}
           </button>
         )}
       </div>
@@ -302,7 +335,7 @@ function Comment({ comment, depth = 0 }) {
       <p className="comment-body">{comment.text}</p>
 
       <div className="comment-actions">
-        <button onClick={() => setShowReplyBox(r => !r)}>Reply</button>
+        <button onClick={() => setShowReplyBox((r) => !r)}>Reply</button>
         <LikeButton commentId={comment.id} />
       </div>
 
@@ -314,9 +347,10 @@ function Comment({ comment, depth = 0 }) {
       )}
 
       {/* Recursive rendering */}
-      {!collapsed && comment.replies?.map(reply => (
-        <Comment key={reply.id} comment={reply} depth={depth + 1} />
-      ))}
+      {!collapsed &&
+        comment.replies?.map((reply) => (
+          <Comment key={reply.id} comment={reply} depth={depth + 1} />
+        ))}
     </div>
   );
 }
@@ -325,10 +359,10 @@ function Comment({ comment, depth = 0 }) {
 // Consider: flat array with parentId, render virtual list
 function flattenComments(comments, parentId = null, depth = 0) {
   return comments
-    .filter(c => c.parentId === parentId)
-    .flatMap(c => [
+    .filter((c) => c.parentId === parentId)
+    .flatMap((c) => [
       { ...c, depth },
-      ...flattenComments(comments, c.id, depth + 1)
+      ...flattenComments(comments, c.id, depth + 1),
     ]);
 }
 ```
@@ -339,16 +373,16 @@ function flattenComments(comments, parentId = null, depth = 0) {
 
 ```jsx
 function DataTable({ data, columns }) {
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
-  const [filter, setFilter] = useState('');
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const [filter, setFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 10;
 
   const filteredData = useMemo(() => {
     if (!filter) return data;
     const lower = filter.toLowerCase();
-    return data.filter(row =>
-      columns.some(col => String(row[col.key]).toLowerCase().includes(lower))
+    return data.filter((row) =>
+      columns.some((col) => String(row[col.key]).toLowerCase().includes(lower))
     );
   }, [data, filter, columns]);
 
@@ -357,8 +391,8 @@ function DataTable({ data, columns }) {
     return [...filteredData].sort((a, b) => {
       const aVal = a[sortConfig.key];
       const bVal = b[sortConfig.key];
-      if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
-      if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+      if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
       return 0;
     });
   }, [filteredData, sortConfig]);
@@ -371,10 +405,10 @@ function DataTable({ data, columns }) {
   const totalPages = Math.ceil(sortedData.length / PAGE_SIZE);
 
   const handleSort = (key) => {
-    setSortConfig(prev =>
+    setSortConfig((prev) =>
       prev.key === key
-        ? { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' }
-        : { key, direction: 'asc' }
+        ? { key, direction: prev.direction === "asc" ? "desc" : "asc" }
+        : { key, direction: "asc" }
     );
     setCurrentPage(1); // reset page on sort
   };
@@ -384,16 +418,23 @@ function DataTable({ data, columns }) {
       <input
         placeholder="Search..."
         value={filter}
-        onChange={e => { setFilter(e.target.value); setCurrentPage(1); }}
+        onChange={(e) => {
+          setFilter(e.target.value);
+          setCurrentPage(1);
+        }}
       />
 
       <table>
         <thead>
           <tr>
-            {columns.map(col => (
-              <th key={col.key} onClick={() => handleSort(col.key)} style={{ cursor: 'pointer' }}>
+            {columns.map((col) => (
+              <th
+                key={col.key}
+                onClick={() => handleSort(col.key)}
+                style={{ cursor: "pointer" }}>
                 {col.label}
-                {sortConfig.key === col.key && (sortConfig.direction === 'asc' ? ' ▲' : ' ▼')}
+                {sortConfig.key === col.key &&
+                  (sortConfig.direction === "asc" ? " ▲" : " ▼")}
               </th>
             ))}
           </tr>
@@ -401,13 +442,21 @@ function DataTable({ data, columns }) {
         <tbody>
           {paginatedData.map((row, i) => (
             <tr key={row.id ?? i}>
-              {columns.map(col => <td key={col.key}>{col.render ? col.render(row) : row[col.key]}</td>)}
+              {columns.map((col) => (
+                <td key={col.key}>
+                  {col.render ? col.render(row) : row[col.key]}
+                </td>
+              ))}
             </tr>
           ))}
         </tbody>
       </table>
 
-      <Pagination currentPage={currentPage} totalPages={totalPages} onChange={setCurrentPage} />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onChange={setCurrentPage}
+      />
     </div>
   );
 }
@@ -424,24 +473,34 @@ const useCartStore = create(
     (set, get) => ({
       items: [],
 
-      addItem: (product) => set((state) => {
-        const existing = state.items.find(i => i.id === product.id);
-        if (existing) {
-          return { items: state.items.map(i =>
-            i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
-          )};
-        }
-        return { items: [...state.items, { ...product, quantity: 1 }] };
-      }),
+      addItem: (product) =>
+        set((state) => {
+          const existing = state.items.find((i) => i.id === product.id);
+          if (existing) {
+            return {
+              items: state.items.map((i) =>
+                i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
+              ),
+            };
+          }
+          return { items: [...state.items, { ...product, quantity: 1 }] };
+        }),
 
-      removeItem: (id) => set((state) => ({
-        items: state.items.filter(i => i.id !== id)
-      })),
+      removeItem: (id) =>
+        set((state) => ({
+          items: state.items.filter((i) => i.id !== id),
+        })),
 
-      updateQuantity: (id, quantity) => set((state) => {
-        if (quantity <= 0) return { items: state.items.filter(i => i.id !== id) };
-        return { items: state.items.map(i => i.id === id ? { ...i, quantity } : i) };
-      }),
+      updateQuantity: (id, quantity) =>
+        set((state) => {
+          if (quantity <= 0)
+            return { items: state.items.filter((i) => i.id !== id) };
+          return {
+            items: state.items.map((i) =>
+              i.id === id ? { ...i, quantity } : i
+            ),
+          };
+        }),
 
       clearCart: () => set({ items: [] }),
 
@@ -453,13 +512,15 @@ const useCartStore = create(
         return get().items.reduce((sum, i) => sum + i.quantity, 0);
       },
     }),
-    { name: 'shopping-cart' } // persists to localStorage
+    { name: "shopping-cart" } // persists to localStorage
   )
 );
 
 function ProductCard({ product }) {
-  const addItem = useCartStore(s => s.addItem);
-  const cartItem = useCartStore(s => s.items.find(i => i.id === product.id));
+  const addItem = useCartStore((s) => s.addItem);
+  const cartItem = useCartStore((s) =>
+    s.items.find((i) => i.id === product.id)
+  );
 
   return (
     <div className="product-card">
@@ -470,7 +531,11 @@ function ProductCard({ product }) {
         <QuantitySelector
           quantity={cartItem.quantity}
           onIncrease={() => addItem(product)}
-          onDecrease={() => useCartStore.getState().updateQuantity(product.id, cartItem.quantity - 1)}
+          onDecrease={() =>
+            useCartStore
+              .getState()
+              .updateQuantity(product.id, cartItem.quantity - 1)
+          }
         />
       ) : (
         <button onClick={() => addItem(product)}>Add to Cart</button>
@@ -512,13 +577,13 @@ Testing Trophy (Kent C. Dodds):
 ```js
 // jest.config.js
 module.exports = {
-  testEnvironment: 'jsdom',
-  setupFilesAfterFramework: ['@testing-library/jest-dom'],
+  testEnvironment: "jsdom",
+  setupFilesAfterFramework: ["@testing-library/jest-dom"],
   moduleNameMapper: {
-    '\\.(css|scss)$': 'identity-obj-proxy',
-    '^@/(.*)$': '<rootDir>/src/$1',
+    "\\.(css|scss)$": "identity-obj-proxy",
+    "^@/(.*)$": "<rootDir>/src/$1",
   },
-  collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/*.d.ts'],
+  collectCoverageFrom: ["src/**/*.{js,jsx,ts,tsx}", "!src/**/*.d.ts"],
 };
 ```
 
@@ -526,19 +591,19 @@ module.exports = {
 
 ```js
 // utils/formatPrice.test.js
-import { formatPrice } from './formatPrice';
+import { formatPrice } from "./formatPrice";
 
-describe('formatPrice', () => {
-  it('formats dollars with cents', () => {
-    expect(formatPrice(10.5)).toBe('$10.50');
+describe("formatPrice", () => {
+  it("formats dollars with cents", () => {
+    expect(formatPrice(10.5)).toBe("$10.50");
   });
 
-  it('handles zero', () => {
-    expect(formatPrice(0)).toBe('$0.00');
+  it("handles zero", () => {
+    expect(formatPrice(0)).toBe("$0.00");
   });
 
-  it('rounds to 2 decimal places', () => {
-    expect(formatPrice(10.999)).toBe('$11.00');
+  it("rounds to 2 decimal places", () => {
+    expect(formatPrice(10.999)).toBe("$11.00");
   });
 });
 ```
@@ -546,16 +611,16 @@ describe('formatPrice', () => {
 ### Testing Custom Hooks
 
 ```js
-import { renderHook, act } from '@testing-library/react';
-import { useCounter } from './useCounter';
+import { renderHook, act } from "@testing-library/react";
+import { useCounter } from "./useCounter";
 
-describe('useCounter', () => {
-  it('starts at initial value', () => {
+describe("useCounter", () => {
+  it("starts at initial value", () => {
     const { result } = renderHook(() => useCounter(5));
     expect(result.current.count).toBe(5);
   });
 
-  it('increments count', () => {
+  it("increments count", () => {
     const { result } = renderHook(() => useCounter(0));
     act(() => result.current.increment());
     expect(result.current.count).toBe(1);
@@ -584,54 +649,54 @@ getByRole > getByLabelText > getByPlaceholderText > getByText > getByDisplayValu
 
 ```jsx
 // LoginForm.test.jsx
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import LoginForm from './LoginForm';
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import LoginForm from "./LoginForm";
 
-describe('LoginForm', () => {
-  it('renders email and password fields', () => {
+describe("LoginForm", () => {
+  it("renders email and password fields", () => {
     render(<LoginForm onSubmit={jest.fn()} />);
 
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /log in/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /log in/i })).toBeInTheDocument();
   });
 
-  it('shows error on invalid email', async () => {
+  it("shows error on invalid email", async () => {
     const user = userEvent.setup();
     render(<LoginForm onSubmit={jest.fn()} />);
 
-    await user.type(screen.getByLabelText(/email/i), 'invalid-email');
-    await user.click(screen.getByRole('button', { name: /log in/i }));
+    await user.type(screen.getByLabelText(/email/i), "invalid-email");
+    await user.click(screen.getByRole("button", { name: /log in/i }));
 
-    expect(screen.getByRole('alert')).toHaveTextContent(/invalid email/i);
+    expect(screen.getByRole("alert")).toHaveTextContent(/invalid email/i);
   });
 
-  it('calls onSubmit with credentials on valid input', async () => {
+  it("calls onSubmit with credentials on valid input", async () => {
     const mockSubmit = jest.fn().mockResolvedValue({ success: true });
     const user = userEvent.setup();
     render(<LoginForm onSubmit={mockSubmit} />);
 
-    await user.type(screen.getByLabelText(/email/i), 'user@example.com');
-    await user.type(screen.getByLabelText(/password/i), 'SecurePass123');
-    await user.click(screen.getByRole('button', { name: /log in/i }));
+    await user.type(screen.getByLabelText(/email/i), "user@example.com");
+    await user.type(screen.getByLabelText(/password/i), "SecurePass123");
+    await user.click(screen.getByRole("button", { name: /log in/i }));
 
     expect(mockSubmit).toHaveBeenCalledWith({
-      email: 'user@example.com',
-      password: 'SecurePass123',
+      email: "user@example.com",
+      password: "SecurePass123",
     });
   });
 
-  it('shows loading state during submission', async () => {
+  it("shows loading state during submission", async () => {
     const mockSubmit = jest.fn(() => new Promise(() => {})); // never resolves
     const user = userEvent.setup();
     render(<LoginForm onSubmit={mockSubmit} />);
 
-    await user.type(screen.getByLabelText(/email/i), 'user@example.com');
-    await user.type(screen.getByLabelText(/password/i), 'password');
-    await user.click(screen.getByRole('button', { name: /log in/i }));
+    await user.type(screen.getByLabelText(/email/i), "user@example.com");
+    await user.type(screen.getByLabelText(/password/i), "password");
+    await user.click(screen.getByRole("button", { name: /log in/i }));
 
-    expect(screen.getByRole('button', { name: /logging in/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /logging in/i })).toBeDisabled();
   });
 });
 ```
@@ -640,29 +705,29 @@ describe('LoginForm', () => {
 
 ```js
 // mocks/handlers.js
-import { rest } from 'msw';
+import { rest } from "msw";
 
 export const handlers = [
-  rest.get('/api/users', (req, res, ctx) => {
-    return res(ctx.json([{ id: 1, name: 'Alice' }]));
+  rest.get("/api/users", (req, res, ctx) => {
+    return res(ctx.json([{ id: 1, name: "Alice" }]));
   }),
 
-  rest.post('/api/login', async (req, res, ctx) => {
+  rest.post("/api/login", async (req, res, ctx) => {
     const { email, password } = await req.json();
-    if (password === 'wrong') {
-      return res(ctx.status(401), ctx.json({ error: 'Invalid credentials' }));
+    if (password === "wrong") {
+      return res(ctx.status(401), ctx.json({ error: "Invalid credentials" }));
     }
-    return res(ctx.json({ token: 'fake-token', user: { email } }));
+    return res(ctx.json({ token: "fake-token", user: { email } }));
   }),
 ];
 
 // mocks/server.js
-import { setupServer } from 'msw/node';
-import { handlers } from './handlers';
+import { setupServer } from "msw/node";
+import { handlers } from "./handlers";
 export const server = setupServer(...handlers);
 
 // setupTests.js
-import { server } from './mocks/server';
+import { server } from "./mocks/server";
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
@@ -672,14 +737,14 @@ afterAll(() => server.close());
 
 ## 12.4 RTL vs Enzyme
 
-| | React Testing Library | Enzyme |
-|---|---|---|
-| Philosophy | Test behavior/UX | Test implementation |
-| API | DOM-centric | Component-centric |
-| Queries | By role, text, label | By component type, props |
-| Shallow render | No (renders full tree) | Yes (isolates component) |
-| Active | Yes | No (deprecated for React 17+) |
-| Recommendation | ✅ Use this | ❌ Avoid |
+|                | React Testing Library  | Enzyme                        |
+| -------------- | ---------------------- | ----------------------------- |
+| Philosophy     | Test behavior/UX       | Test implementation           |
+| API            | DOM-centric            | Component-centric             |
+| Queries        | By role, text, label   | By component type, props      |
+| Shallow render | No (renders full tree) | Yes (isolates component)      |
+| Active         | Yes                    | No (deprecated for React 17+) |
+| Recommendation | ✅ Use this            | ❌ Avoid                      |
 
 ---
 
@@ -697,35 +762,35 @@ afterAll(() => server.close());
 
 ```js
 // cypress/e2e/checkout.cy.js
-describe('Checkout Flow', () => {
+describe("Checkout Flow", () => {
   beforeEach(() => {
-    cy.intercept('GET', '/api/products', { fixture: 'products.json' });
-    cy.visit('/products');
+    cy.intercept("GET", "/api/products", { fixture: "products.json" });
+    cy.visit("/products");
   });
 
-  it('completes a purchase', () => {
+  it("completes a purchase", () => {
     // Add to cart
-    cy.findByText('Add to Cart').first().click();
-    cy.findByRole('status', { name: /cart/i }).should('contain', '1');
+    cy.findByText("Add to Cart").first().click();
+    cy.findByRole("status", { name: /cart/i }).should("contain", "1");
 
     // Go to cart
-    cy.findByRole('link', { name: /cart/i }).click();
-    cy.url().should('include', '/cart');
+    cy.findByRole("link", { name: /cart/i }).click();
+    cy.url().should("include", "/cart");
 
     // Proceed to checkout
-    cy.findByRole('button', { name: /checkout/i }).click();
+    cy.findByRole("button", { name: /checkout/i }).click();
 
     // Fill shipping info
-    cy.findByLabelText(/email/i).type('test@example.com');
-    cy.findByLabelText(/address/i).type('123 Main St');
+    cy.findByLabelText(/email/i).type("test@example.com");
+    cy.findByLabelText(/address/i).type("123 Main St");
 
     // Complete order
-    cy.intercept('POST', '/api/orders', { id: 'order-123' }).as('createOrder');
-    cy.findByRole('button', { name: /place order/i }).click();
-    cy.wait('@createOrder');
+    cy.intercept("POST", "/api/orders", { id: "order-123" }).as("createOrder");
+    cy.findByRole("button", { name: /place order/i }).click();
+    cy.wait("@createOrder");
 
     // Success page
-    cy.findByText(/order confirmed/i).should('be.visible');
+    cy.findByText(/order confirmed/i).should("be.visible");
   });
 });
 ```
@@ -753,6 +818,7 @@ Coverage targets (realistic):
 ## 13.1 XSS (Cross-Site Scripting)
 
 ### What It Is
+
 Attacker injects malicious scripts into your UI that execute in users' browsers.
 
 ### React's Built-in Protection
@@ -768,11 +834,11 @@ return <div>{userInput}</div>;
 
 ```jsx
 // ❌ DANGEROUS: bypasses React's XSS protection
-<div dangerouslySetInnerHTML={{ __html: userContent }} />
+<div dangerouslySetInnerHTML={{ __html: userContent }} />;
 
 // ✅ Always sanitize before using dangerouslySetInnerHTML
-import DOMPurify from 'dompurify';
-<div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(userContent) }} />
+import DOMPurify from "dompurify";
+<div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(userContent) }} />;
 ```
 
 ### Other XSS Vectors
@@ -780,18 +846,18 @@ import DOMPurify from 'dompurify';
 ```jsx
 // ❌ href injection
 const url = 'javascript:alert("xss")'; // user-provided
-<a href={url}>Click me</a>
+<a href={url}>Click me</a>;
 
 // ✅ Validate URL scheme
 function isSafeUrl(url) {
   try {
     const parsed = new URL(url);
-    return ['http:', 'https:'].includes(parsed.protocol);
+    return ["http:", "https:"].includes(parsed.protocol);
   } catch {
     return false;
   }
 }
-<a href={isSafeUrl(url) ? url : '#'}>Click me</a>
+<a href={isSafeUrl(url) ? url : "#"}>Click me</a>;
 ```
 
 ---
@@ -799,6 +865,7 @@ function isSafeUrl(url) {
 ## 13.2 CSRF (Cross-Site Request Forgery)
 
 ### What It Is
+
 Attacker tricks a logged-in user's browser into making unauthorized requests.
 
 ### React-Level Mitigations
@@ -807,9 +874,9 @@ Attacker tricks a logged-in user's browser into making unauthorized requests.
 // 1. Include CSRF token in all mutating requests
 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
 
-api.interceptors.request.use(config => {
-  if (['post', 'put', 'delete', 'patch'].includes(config.method)) {
-    config.headers['X-CSRF-Token'] = csrfToken;
+api.interceptors.request.use((config) => {
+  if (["post", "put", "delete", "patch"].includes(config.method)) {
+    config.headers["X-CSRF-Token"] = csrfToken;
   }
   return config;
 });
@@ -825,13 +892,13 @@ api.interceptors.request.use(config => {
 
 ### JWT Storage Options
 
-| Storage | XSS Risk | CSRF Risk | Notes |
-|---|---|---|---|
-| localStorage | HIGH | None | Accessible by JS |
-| sessionStorage | HIGH | None | Cleared on tab close |
-| Memory (React state) | None | None | Lost on page refresh |
-| HttpOnly Cookie | None | Medium | Best for session tokens |
-| Cookie + SameSite | None | Low | Best practice |
+| Storage              | XSS Risk | CSRF Risk | Notes                   |
+| -------------------- | -------- | --------- | ----------------------- |
+| localStorage         | HIGH     | None      | Accessible by JS        |
+| sessionStorage       | HIGH     | None      | Cleared on tab close    |
+| Memory (React state) | None     | None      | Lost on page refresh    |
+| HttpOnly Cookie      | None     | Medium    | Best for session tokens |
+| Cookie + SameSite    | None     | Low       | Best practice           |
 
 ### Recommended Approach
 
@@ -839,25 +906,26 @@ api.interceptors.request.use(config => {
 // ✅ Store access token in memory only
 let accessToken = null;
 
-export function setAccessToken(token) { accessToken = token; }
-export function getAccessToken() { return accessToken; }
+export function setAccessToken(token) {
+  accessToken = token;
+}
+export function getAccessToken() {
+  return accessToken;
+}
 
 // HttpOnly cookie for refresh token (server sets it)
 // When access token expires: hit /api/refresh → server issues new access token
 
 // In axios interceptor:
-api.interceptors.response.use(
-  null,
-  async (error) => {
-    if (error.response?.status === 401) {
-      // refresh token is in HttpOnly cookie — browser sends it automatically
-      await api.post('/auth/refresh');
-      const newToken = await api.get('/auth/token');
-      setAccessToken(newToken.data.accessToken);
-      return api(error.config); // retry
-    }
+api.interceptors.response.use(null, async (error) => {
+  if (error.response?.status === 401) {
+    // refresh token is in HttpOnly cookie — browser sends it automatically
+    await api.post("/auth/refresh");
+    const newToken = await api.get("/auth/token");
+    setAccessToken(newToken.data.accessToken);
+    return api(error.config); // retry
   }
-);
+});
 ```
 
 ---
@@ -866,13 +934,14 @@ api.interceptors.response.use(
 
 ```html
 <!-- Prevent inline scripts, restrict sources -->
-<meta http-equiv="Content-Security-Policy"
+<meta
+  http-equiv="Content-Security-Policy"
   content="default-src 'self';
            script-src 'self' 'nonce-{RANDOM_NONCE}';
            style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
            img-src 'self' https://cdn.example.com data:;
            connect-src 'self' https://api.example.com;
-           font-src 'self' https://fonts.gstatic.com;">
+           font-src 'self' https://fonts.gstatic.com;" />
 ```
 
 > With a strict CSP, even if XSS code is injected, it cannot execute without the correct nonce.
@@ -885,36 +954,42 @@ api.interceptors.response.use(
 ## React App Security Checklist
 
 ### XSS Prevention
+
 - [ ] Never use dangerouslySetInnerHTML without DOMPurify sanitization
 - [ ] Validate all URL props to prevent javascript: scheme injection
 - [ ] Implement CSP headers with strict policy
 - [ ] Use `rel="noopener noreferrer"` on external links
 
 ### Authentication
+
 - [ ] Store JWT access tokens in memory (not localStorage)
 - [ ] Store refresh tokens in HttpOnly, Secure, SameSite=Strict cookies
 - [ ] Implement token rotation on refresh
 - [ ] Add logout across all tabs (BroadcastChannel)
 
 ### API Security
+
 - [ ] Include CSRF token in all mutating requests
 - [ ] Implement request rate limiting
 - [ ] Validate and sanitize all user inputs
 - [ ] Never expose sensitive data in URL params
 
 ### Dependencies
+
 - [ ] Run `npm audit` regularly in CI
 - [ ] Use Dependabot or Snyk for automated vulnerability alerts
 - [ ] Pin critical dependency versions
 - [ ] Review new dependency permissions before install
 
 ### HTTPS & Headers
+
 - [ ] HTTPS everywhere (including dev via mkcert)
 - [ ] HSTS header enabled
 - [ ] X-Frame-Options: DENY (prevent clickjacking)
 - [ ] X-Content-Type-Options: nosniff
 
 ### Secrets
+
 - [ ] No API keys, tokens, or passwords in frontend code or git history
 - [ ] Use environment variables for config (never committed)
 - [ ] Git pre-commit hooks to catch accidental secrets (git-secrets, detect-secrets)
@@ -969,22 +1044,22 @@ Source Files (.jsx, .tsx, .scss)
 
 ### Vite vs Webpack vs Create React App
 
-| | Vite | Webpack (CRA) | Parcel |
-|---|---|---|---|
-| Dev server | ESM native (instant) | Bundled (slow start) | Zero-config |
-| HMR | Very fast | Slower | Fast |
-| Build | Rollup (optimized) | Webpack | Custom |
-| Config | Minimal | Complex | Zero-config |
-| Modern | ✅ | Legacy | ✅ |
-| Plugin ecosystem | Growing | Mature | Small |
+|                  | Vite                 | Webpack (CRA)        | Parcel      |
+| ---------------- | -------------------- | -------------------- | ----------- |
+| Dev server       | ESM native (instant) | Bundled (slow start) | Zero-config |
+| HMR              | Very fast            | Slower               | Fast        |
+| Build            | Rollup (optimized)   | Webpack              | Custom      |
+| Config           | Minimal              | Complex              | Zero-config |
+| Modern           | ✅                   | Legacy               | ✅          |
+| Plugin ecosystem | Growing              | Mature               | Small       |
 
 ### Vite Configuration
 
 ```js
 // vite.config.js
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import { visualizer } from 'rollup-plugin-visualizer';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { visualizer } from "rollup-plugin-visualizer";
 
 export default defineConfig({
   plugins: [
@@ -995,16 +1070,16 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom'],
-          router: ['react-router-dom'],
-          query: ['@tanstack/react-query'],
+          vendor: ["react", "react-dom"],
+          router: ["react-router-dom"],
+          query: ["@tanstack/react-query"],
         },
       },
     },
     chunkSizeWarningLimit: 500, // warn if chunk > 500KB
   },
   resolve: {
-    alias: { '@': '/src' },
+    alias: { "@": "/src" },
   },
 });
 ```
@@ -1027,7 +1102,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '20', cache: 'npm' }
+        with: { node-version: "20", cache: "npm" }
       - run: npm ci
       - run: npm run test -- --coverage --ci
       - run: npm run lint
@@ -1039,7 +1114,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '20', cache: 'npm' }
+        with: { node-version: "20", cache: "npm" }
       - run: npm ci && npm run build
 
       # Deploy to AWS S3 + CloudFront
@@ -1140,6 +1215,7 @@ CMD ["nginx", "-g", "daemon off;"]
 ## 15.1 What is Micro Frontend?
 
 ### Concept
+
 Micro frontends extend microservices principles to the frontend. A large web app is split into **independently developed, deployed, and owned** frontend applications that appear as one to the user.
 
 ```
@@ -1157,13 +1233,13 @@ Traditional Monolith:         Micro Frontend:
 
 ### Why Use It?
 
-| Problem (Monolith) | Solution (Micro Frontend) |
-|---|---|
+| Problem (Monolith)           | Solution (Micro Frontend)  |
+| ---------------------------- | -------------------------- |
 | Large team = merge conflicts | Independent team ownership |
-| Deploy one → breaks all | Independent deployments |
-| Forced tech stack | Team can choose their own |
-| Slow CI/CD | Faster per-team pipelines |
-| Hard to scale teams | Clear ownership boundaries |
+| Deploy one → breaks all      | Independent deployments    |
+| Forced tech stack            | Team can choose their own  |
+| Slow CI/CD                   | Faster per-team pipelines  |
+| Hard to scale teams          | Clear ownership boundaries |
 
 ### Drawbacks
 
@@ -1178,24 +1254,25 @@ Traditional Monolith:         Micro Frontend:
 ## 15.2 Module Federation (Webpack 5)
 
 ### Concept
+
 Module Federation allows a JavaScript application to **dynamically load code from another application** at runtime, sharing modules between them.
 
 ```js
 // Remote app (product-catalog) — webpack.config.js
-const { ModuleFederationPlugin } = require('webpack').container;
+const { ModuleFederationPlugin } = require("webpack").container;
 
 module.exports = {
   plugins: [
     new ModuleFederationPlugin({
-      name: 'productCatalog',
-      filename: 'remoteEntry.js',  // entry point exposed to host
+      name: "productCatalog",
+      filename: "remoteEntry.js", // entry point exposed to host
       exposes: {
-        './ProductList': './src/components/ProductList',
-        './ProductCard': './src/components/ProductCard',
+        "./ProductList": "./src/components/ProductList",
+        "./ProductCard": "./src/components/ProductCard",
       },
       shared: {
-        react: { singleton: true, requiredVersion: '^18.0.0' },
-        'react-dom': { singleton: true, requiredVersion: '^18.0.0' },
+        react: { singleton: true, requiredVersion: "^18.0.0" },
+        "react-dom": { singleton: true, requiredVersion: "^18.0.0" },
       },
     }),
   ],
@@ -1205,21 +1282,22 @@ module.exports = {
 module.exports = {
   plugins: [
     new ModuleFederationPlugin({
-      name: 'shell',
+      name: "shell",
       remotes: {
-        productCatalog: 'productCatalog@https://catalog.example.com/remoteEntry.js',
-        cart: 'cart@https://cart.example.com/remoteEntry.js',
+        productCatalog:
+          "productCatalog@https://catalog.example.com/remoteEntry.js",
+        cart: "cart@https://cart.example.com/remoteEntry.js",
       },
       shared: {
-        react: { singleton: true, requiredVersion: '^18.0.0' },
-        'react-dom': { singleton: true, requiredVersion: '^18.0.0' },
+        react: { singleton: true, requiredVersion: "^18.0.0" },
+        "react-dom": { singleton: true, requiredVersion: "^18.0.0" },
       },
     }),
   ],
 };
 
 // Usage in shell — loads ProductList from remote at runtime
-const ProductList = React.lazy(() => import('productCatalog/ProductList'));
+const ProductList = React.lazy(() => import("productCatalog/ProductList"));
 
 function App() {
   return (
@@ -1238,13 +1316,15 @@ function App() {
 
 ```js
 // MFE 1: User logs in
-window.dispatchEvent(new CustomEvent('user:login', {
-  detail: { userId: '123', name: 'Alice' },
-  bubbles: true,
-}));
+window.dispatchEvent(
+  new CustomEvent("user:login", {
+    detail: { userId: "123", name: "Alice" },
+    bubbles: true,
+  })
+);
 
 // MFE 2: Cart listens for login to fetch user's cart
-window.addEventListener('user:login', (event) => {
+window.addEventListener("user:login", (event) => {
   const { userId } = event.detail;
   fetchCart(userId);
 });
@@ -1263,7 +1343,9 @@ window.addEventListener('user:login', (event) => {
 ```js
 // Shared event bus library
 class EventBus {
-  constructor() { this.listeners = {}; }
+  constructor() {
+    this.listeners = {};
+  }
 
   on(event, callback) {
     (this.listeners[event] ??= []).push(callback);
@@ -1271,11 +1353,13 @@ class EventBus {
   }
 
   emit(event, data) {
-    this.listeners[event]?.forEach(cb => cb(data));
+    this.listeners[event]?.forEach((cb) => cb(data));
   }
 
   off(event, callback) {
-    this.listeners[event] = this.listeners[event]?.filter(cb => cb !== callback);
+    this.listeners[event] = this.listeners[event]?.filter(
+      (cb) => cb !== callback
+    );
   }
 }
 
@@ -1291,24 +1375,24 @@ Single-SPA is a JavaScript framework for micro frontends that routes between mul
 
 ```js
 // root-config.js
-import { registerApplication, start } from 'single-spa';
+import { registerApplication, start } from "single-spa";
 
 registerApplication({
-  name: '@myorg/navbar',
-  app: () => import('@myorg/navbar'),
-  activeWhen: ['/'],  // active on all routes
+  name: "@myorg/navbar",
+  app: () => import("@myorg/navbar"),
+  activeWhen: ["/"], // active on all routes
 });
 
 registerApplication({
-  name: '@myorg/products',
-  app: () => import('@myorg/products'),
-  activeWhen: '/products',
+  name: "@myorg/products",
+  app: () => import("@myorg/products"),
+  activeWhen: "/products",
 });
 
 registerApplication({
-  name: '@myorg/checkout',
-  app: () => import('@myorg/checkout'),
-  activeWhen: '/checkout',
+  name: "@myorg/checkout",
+  app: () => import("@myorg/checkout"),
+  activeWhen: "/checkout",
 });
 
 start();
@@ -1360,14 +1444,17 @@ All MFEs share the same design system version. Upgrade in one place.
 ## 15.7 Micro Frontend Interview Questions
 
 **Q: What are the main challenges of micro frontends?**
+
 > 1. **Bundle duplication**: Shared libraries (React, design system) loaded multiple times. Mitigate with Module Federation `shared` config. 2. **Routing conflicts**: Multiple routers in the same page. Use the shell for top-level routing. 3. **Authentication**: Session must be accessible across MFEs — use shared cookie or custom event. 4. **Design consistency**: Enforce a shared design system package. 5. **Performance**: MFEs load sequentially causing waterfalls — mitigate with preloading.
 
 **Q: How to share React version across MFEs?**
+
 > Use Webpack Module Federation's `shared` config with `singleton: true`. This ensures only one instance of React is loaded regardless of how many MFEs request it. All MFEs must have compatible version ranges.
 
 **Q: How do deployments work in Micro Frontends?**
+
 > Each MFE has its own CI/CD pipeline. Changes in one MFE trigger only that MFE's build and deploy. The host app references remote MFEs by URL — either pinned version URLs (`remoteEntry.v1.2.3.js`) for stability or latest URLs (`remoteEntry.js`) for continuous deployment.
 
 ---
 
-*End of Part 3 — Sections 11–15*
+_End of Part 3 — Sections 11–15_
