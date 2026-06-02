@@ -1,3 +1,7 @@
+---
+render_with_liquid: false
+---
+
 # 🚀 Senior Frontend Engineer / React Developer Interview Handbook
 
 ## Part 4: Sections 16–20 | NPM → Q&A → Mental Models → Checklist → FAANG Deep Dive

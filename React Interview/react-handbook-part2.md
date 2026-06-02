@@ -1,3 +1,7 @@
+---
+render_with_liquid: false
+---
+
 # 🚀 Senior Frontend Engineer / React Developer Interview Handbook
 
 ## Part 2: Sections 6–10 | State Management → Router → API → Patterns → System Design

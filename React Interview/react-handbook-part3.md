@@ -1,3 +1,7 @@
+---
+render_with_liquid: false
+---
+
 # 🚀 Senior Frontend Engineer / React Developer Interview Handbook
 
 ## Part 3: Sections 11–15 | Machine Coding → Testing → Security → Build → Micro Frontends

@@ -1,9 +1,5 @@
 # GitHub Pages / Jekyll configuration
 
-# Disable Liquid template processing so {{ }} in code blocks
-# (JSX/JS object syntax) is not misinterpreted as Liquid tags.
-render_with_liquid: false
-
 theme: jekyll-theme-minimal
 title: JavaScript Concepts
 description: JavaScript Concepts with Code Examples and Interview Questions

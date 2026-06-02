@@ -1,3 +1,7 @@
+---
+render_with_liquid: false
+---
+
 # 🚀 Senior Frontend Engineer / React Developer Interview Handbook
 
 ## Part 1: Sections 1–5 | Fundamentals → Core → Hooks → Internals → Performance
