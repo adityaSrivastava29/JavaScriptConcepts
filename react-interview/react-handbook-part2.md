@@ -141,6 +141,8 @@ const UIContext = createContext({}); // changes frequently (sidebar, modal)
 
 ## 6.3 Redux & Redux Toolkit (RTK)
 
+> 📖 **Deep dive:** [Redux & RTK Complete Guide](/react-interview/redux-rtk-guide) — Plain Redux from scratch → RTK Slices → RTK Query → Testing → Interview Q&A
+
 ### Architecture
 
 ```

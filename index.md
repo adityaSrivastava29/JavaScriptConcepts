@@ -34,6 +34,7 @@ layout: default
 - [Part 2 — State Management, Router, API Handling, Patterns, System Design](react-interview/react-handbook-part2)
 - [Part 3 — Machine Coding, Testing, Security, Build & Deploy, Micro Frontends](react-interview/react-handbook-part3)
 - [Part 4 — NPM Packages, 200+ Interview Q&A, Mental Models, Checklist, FAANG Internals](react-interview/react-handbook-part4)
+- [⚡ Redux & RTK Complete Guide — Plain Redux → RTK → RTK Query](react-interview/redux-rtk-guide)
 
 ---
 
