@@ -1063,6 +1063,85 @@ Source Files (.jsx, .tsx, .scss)
 | Modern           | ✅                   | Legacy               | ✅          |
 | Plugin ecosystem | Growing              | Mature               | Small       |
 
+### Create React App — Commands
+
+```bash
+# JavaScript
+npx create-react-app my-app
+cd my-app && npm start
+
+# TypeScript
+npx create-react-app my-app --template typescript
+
+# ⚠️ CRA is no longer maintained — avoid for new projects
+```
+
+### Vite — Commands (Recommended)
+
+```bash
+# Interactive setup (picks framework + variant)
+npm create vite@latest my-app
+cd my-app && npm install && npm run dev
+
+# JavaScript + React (non-interactive)
+npm create vite@latest my-app -- --template react
+
+# TypeScript + React
+npm create vite@latest my-app -- --template react-ts
+
+# Using yarn / pnpm
+yarn create vite my-app --template react-ts
+pnpm create vite my-app --template react-ts
+
+# Scripts after setup
+npm run dev      # dev server (http://localhost:5173)
+npm run build    # production build → /dist
+npm run preview  # locally preview /dist
+npm run lint     # ESLint
+```
+
+### Parcel — Commands
+
+```bash
+# No config needed — install and go
+npm install --save-dev parcel
+mkdir my-app && cd my-app && npm init -y
+
+# Create entry point
+echo '<html><body><script type="module" src="./src/index.jsx"></script></body></html>' > index.html
+mkdir src && touch src/index.jsx
+
+# Scripts in package.json
+# "start": "parcel index.html"
+# "build": "parcel build index.html"
+
+npm start       # dev server with HMR
+npm run build   # output → /dist
+```
+
+### Next.js — Commands (SSR / Full-stack React)
+
+```bash
+# JavaScript
+npx create-next-app@latest my-app
+
+# TypeScript (recommended)
+npx create-next-app@latest my-app --typescript
+
+# With all options pre-set (TypeScript, ESLint, Tailwind, App Router)
+npx create-next-app@latest my-app \
+  --typescript \
+  --eslint \
+  --tailwind \
+  --app \
+  --src-dir \
+  --import-alias "@/*"
+
+npm run dev    # http://localhost:3000
+npm run build  # production build
+npm run start  # run production build locally
+```
+
 ### Vite Configuration
 
 ```js
@@ -1237,233 +1316,1049 @@ Traditional Monolith:         Micro Frontend:
 │                    │        │  Deploy  │  Deploy  │  Deploy  │
 └────────────────────┘        └──────────┴──────────┴──────────┘
                                           │
-                                   Shell / Container
-                                   (composes MFEs)
+                                   Shell / Container App
+                              (owns routing + composes MFEs)
 ```
 
 ### Why Use It?
 
-| Problem (Monolith)           | Solution (Micro Frontend)  |
-| ---------------------------- | -------------------------- |
-| Large team = merge conflicts | Independent team ownership |
-| Deploy one → breaks all      | Independent deployments    |
-| Forced tech stack            | Team can choose their own  |
-| Slow CI/CD                   | Faster per-team pipelines  |
-| Hard to scale teams          | Clear ownership boundaries |
+| Problem (Monolith)           | Solution (Micro Frontend)    |
+| ---------------------------- | ---------------------------- |
+| Large team = merge conflicts | Independent team ownership   |
+| Deploy one → risk breaks all | Independent deployments      |
+| Forced tech stack            | Teams choose their own stack |
+| Slow CI/CD (huge test suite) | Faster per-team pipelines    |
+| Hard to scale teams          | Clear domain ownership       |
+| One team blocks all others   | Parallel development         |
 
 ### Drawbacks
 
 - **Increased complexity**: Multiple builds, deployments, versioning.
-- **Bundle duplication**: React loaded multiple times (mitigated by shared libs).
-- **Communication overhead**: Events, shared state across boundaries.
-- **UI consistency**: Harder to maintain design system.
-- **Performance**: Network waterfalls loading MFEs.
+- **Bundle duplication**: React loaded multiple times without sharing config.
+- **Cross-MFE bugs**: Hard to reproduce — which app caused it?
+- **UI inconsistency**: Design drift across teams without a shared system.
+- **Performance**: Sequential network waterfalls loading MFEs.
+- **Testing**: Integration testing across MFE boundaries is hard.
 
 ---
 
-## 15.2 Module Federation (Webpack 5)
+## 15.2 How to Split a Monolith into Micro Frontends
 
-### Concept
+### Step 1 — Identify Domain Boundaries
 
-Module Federation allows a JavaScript application to **dynamically load code from another application** at runtime, sharing modules between them.
+Split by **business domain**, not by technical layers.
+
+```
+❌ Bad split (technical layers):
+   MFE-1: All buttons/inputs (UI components)
+   MFE-2: All API calls
+   MFE-3: All pages
+
+✅ Good split (business domains):
+   MFE-1: Auth (login, register, forgot password)
+   MFE-2: Product Catalog (browse, search, filters)
+   MFE-3: Cart & Checkout (cart, payment, order confirmation)
+   MFE-4: User Account (profile, orders, settings)
+   Shell:  Navigation, routing, auth state handoff
+```
+
+### Step 2 — Define the Folder / Repo Structure
+
+**Polyrepo** (separate git repo per MFE — most common at scale):
+
+```
+github.com/myorg/shell-app        ← composes everything
+github.com/myorg/mfe-auth
+github.com/myorg/mfe-catalog
+github.com/myorg/mfe-cart
+github.com/myorg/design-system    ← shared npm package
+```
+
+**Monorepo** (all MFEs in one repo, separate builds — good for smaller orgs):
+
+```
+/packages
+  /shell
+  /mfe-auth
+  /mfe-catalog
+  /mfe-cart
+  /design-system
+/package.json   ← workspace root (npm workspaces / turborepo)
+```
+
+### Step 3 — Choose an Integration Approach
+
+| Approach                    | How                                      | When to use                             |
+| --------------------------- | ---------------------------------------- | --------------------------------------- |
+| **Module Federation**       | JS bundles loaded at runtime via Webpack | Same-framework teams (React + React)    |
+| **iframes**                 | Each MFE in its own iframe               | Strong isolation needed, legacy MFEs    |
+| **Web Components**          | Custom Elements API                      | Cross-framework (React + Vue + Angular) |
+| **Single-SPA**              | JS framework for routing between MFEs    | Mixed frameworks, SPA feel              |
+| **Server-Side Composition** | Server assembles HTML fragments          | SSR, Edge computing (Next.js + Vercel)  |
+| **Build-time Integration**  | npm packages, imported at build time     | Shared component libraries only         |
+
+### Step 4 — Scaffold Each MFE
+
+Each MFE is a standalone React app that can also run in isolation:
+
+```
+mfe-catalog/
+├── public/
+│   └── index.html          ← standalone dev entry
+├── src/
+│   ├── components/
+│   ├── pages/
+│   ├── store/
+│   ├── bootstrap.jsx       ← async bootstrap (required for MF)
+│   └── index.jsx           ← entry: standalone OR remote
+├── webpack.config.js       ← ModuleFederationPlugin config
+└── package.json
+```
+
+```jsx
+// src/index.jsx — entry for BOTH standalone and remote
+import("./bootstrap"); // async import ensures shared deps load first
+
+// src/bootstrap.jsx
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+
+// Standalone dev mode
+const root = document.getElementById("root");
+if (root) {
+  ReactDOM.createRoot(root).render(<App />);
+}
+
+// Export mount/unmount for shell to control lifecycle
+export function mount(el, { routerBaseName } = {}) {
+  const r = ReactDOM.createRoot(el);
+  r.render(<App baseName={routerBaseName} />);
+  return () => r.unmount();
+}
+```
+
+---
+
+## 15.3 Module Federation (Webpack 5) — Complete Setup
+
+### Install
+
+```bash
+# Each MFE and the shell
+npm install webpack webpack-cli webpack-dev-server
+npm install @babel/core babel-loader @babel/preset-react @babel/preset-env
+npm install html-webpack-plugin
+```
+
+### Remote MFE — webpack.config.js (mfe-catalog)
 
 ```js
-// Remote app (product-catalog) — webpack.config.js
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { ModuleFederationPlugin } = require("webpack").container;
+const deps = require("./package.json").dependencies;
 
 module.exports = {
+  mode: "development",
+  entry: "./src/index.jsx",
+
+  output: {
+    publicPath: "http://localhost:3001/", // MUST match where this MFE is hosted
+    uniqueName: "mfeCatalog",
+  },
+
+  resolve: { extensions: [".jsx", ".js"] },
+
+  module: {
+    rules: [
+      {
+        test: /\.jsx?$/,
+        use: "babel-loader",
+        exclude: /node_modules/,
+      },
+    ],
+  },
+
   plugins: [
     new ModuleFederationPlugin({
-      name: "productCatalog",
-      filename: "remoteEntry.js", // entry point exposed to host
+      name: "mfeCatalog", // unique ID — used by host to reference
+      filename: "remoteEntry.js", // the manifest file host loads
+
+      // What this MFE exposes to others
       exposes: {
+        "./App": "./src/bootstrap", // full app
         "./ProductList": "./src/components/ProductList",
         "./ProductCard": "./src/components/ProductCard",
+        "./useCart": "./src/hooks/useCart", // even hooks can be exposed!
       },
+
+      // Shared dependencies — avoids loading React twice
       shared: {
-        react: { singleton: true, requiredVersion: "^18.0.0" },
-        "react-dom": { singleton: true, requiredVersion: "^18.0.0" },
+        react: {
+          singleton: true,
+          requiredVersion: deps.react,
+          eager: false, // lazy load (recommended)
+        },
+        "react-dom": {
+          singleton: true,
+          requiredVersion: deps["react-dom"],
+        },
+        "react-router-dom": {
+          singleton: true,
+          requiredVersion: deps["react-router-dom"],
+        },
       },
     }),
-  ],
-};
 
-// Host app (shell) — webpack.config.js
+    new HtmlWebpackPlugin({ template: "./public/index.html" }),
+  ],
+
+  devServer: {
+    port: 3001,
+    historyApiFallback: true,
+    headers: { "Access-Control-Allow-Origin": "*" }, // required for CORS
+  },
+};
+```
+
+### Shell (Host) — webpack.config.js
+
+```js
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { ModuleFederationPlugin } = require("webpack").container;
+const deps = require("./package.json").dependencies;
+
 module.exports = {
+  mode: "development",
+  entry: "./src/index.jsx",
+
+  output: { publicPath: "http://localhost:3000/" },
+
   plugins: [
     new ModuleFederationPlugin({
       name: "shell",
+
+      // Register all remote MFEs
       remotes: {
-        productCatalog:
-          "productCatalog@https://catalog.example.com/remoteEntry.js",
-        cart: "cart@https://cart.example.com/remoteEntry.js",
+        // format: "name@url/remoteEntry.js"
+        mfeCatalog: "mfeCatalog@http://localhost:3001/remoteEntry.js",
+        mfeCart: "mfeCart@http://localhost:3002/remoteEntry.js",
+        mfeAuth: "mfeAuth@http://localhost:3003/remoteEntry.js",
       },
+
       shared: {
-        react: { singleton: true, requiredVersion: "^18.0.0" },
-        "react-dom": { singleton: true, requiredVersion: "^18.0.0" },
+        react: { singleton: true, requiredVersion: deps.react },
+        "react-dom": { singleton: true, requiredVersion: deps["react-dom"] },
+        "react-router-dom": { singleton: true },
       },
     }),
-  ],
-};
 
-// Usage in shell — loads ProductList from remote at runtime
-const ProductList = React.lazy(() => import("productCatalog/ProductList"));
+    new HtmlWebpackPlugin({ template: "./public/index.html" }),
+  ],
+
+  devServer: { port: 3000, historyApiFallback: true },
+};
+```
+
+### Shell App — Routing with Lazy Remote MFEs
+
+```jsx
+// shell/src/App.jsx
+import React, { Suspense, lazy } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import ErrorBoundary from "./components/ErrorBoundary";
+
+// Lazy-load remote MFEs — loaded only when route is visited
+const CatalogApp = lazy(() => import("mfeCatalog/App"));
+const CartApp = lazy(() => import("mfeCart/App"));
+const AuthApp = lazy(() => import("mfeAuth/App"));
 
 function App() {
   return (
-    <Suspense fallback={<Loading />}>
-      <ProductList />
-    </Suspense>
+    <BrowserRouter>
+      <Navbar />
+      <ErrorBoundary fallback={<div>Failed to load module. Retry?</div>}>
+        <Suspense fallback={<div>Loading...</div>}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route
+              path="/products/*"
+              element={<CatalogApp baseName="/products" />}
+            />
+            <Route path="/cart/*" element={<CartApp baseName="/cart" />} />
+            <Route path="/auth/*" element={<AuthApp baseName="/auth" />} />
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
+    </BrowserRouter>
   );
 }
 ```
 
----
+### Error Boundary for MFE Load Failures
 
-## 15.3 Communication Strategies Between MFEs
+```jsx
+// Always wrap remote imports — network can fail!
+class ErrorBoundary extends React.Component {
+  state = { hasError: false, error: null };
 
-### Custom Events (Decoupled)
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        this.props.fallback ?? (
+          <div>
+            <p>This section failed to load.</p>
+            <button onClick={() => this.setState({ hasError: false })}>
+              Retry
+            </button>
+          </div>
+        )
+      );
+    }
+    return this.props.children;
+  }
+}
+```
+
+### Dynamic Remotes (Load URL at Runtime)
 
 ```js
-// MFE 1: User logs in
-window.dispatchEvent(
-  new CustomEvent("user:login", {
-    detail: { userId: "123", name: "Alice" },
-    bubbles: true,
-  })
-);
+// Load remote URL from config API instead of hardcoding
+// Useful when MFE URLs change per environment (dev/staging/prod)
 
-// MFE 2: Cart listens for login to fetch user's cart
-window.addEventListener("user:login", (event) => {
-  const { userId } = event.detail;
-  fetchCart(userId);
+async function loadRemoteModule(scope, module, url) {
+  // Inject the remote's script tag dynamically
+  await new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = url;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+
+  await __webpack_init_sharing__("default");
+  const container = window[scope];
+  await container.init(__webpack_share_scopes__.default);
+  const factory = await container.get(module);
+  return factory();
+}
+
+// Usage
+const { default: ProductList } = await loadRemoteModule(
+  "mfeCatalog",
+  "./ProductList",
+  "https://catalog.example.com/remoteEntry.js"
+);
+```
+
+---
+
+## 15.4 Vite + Module Federation (Modern Setup)
+
+```bash
+npm install @originjs/vite-plugin-federation --save-dev
+```
+
+```js
+// mfe-catalog/vite.config.js (remote)
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import federation from "@originjs/vite-plugin-federation";
+
+export default defineConfig({
+  plugins: [
+    react(),
+    federation({
+      name: "mfeCatalog",
+      filename: "remoteEntry.js",
+      exposes: {
+        "./App": "./src/bootstrap",
+        "./ProductList": "./src/components/ProductList",
+      },
+      shared: ["react", "react-dom", "react-router-dom"],
+    }),
+  ],
+  build: { target: "esnext" }, // required for top-level await
 });
 ```
 
-### Shared State via URL
-
 ```js
-// MFEs communicate via URL params and query string
-// Shell app manages routing, MFEs read from URL
-// Example: /checkout?cartId=abc&coupon=SAVE10
+// shell/vite.config.js (host)
+import federation from "@originjs/vite-plugin-federation";
+
+export default defineConfig({
+  plugins: [
+    react(),
+    federation({
+      name: "shell",
+      remotes: {
+        mfeCatalog: "http://localhost:3001/assets/remoteEntry.js",
+        mfeCart: "http://localhost:3002/assets/remoteEntry.js",
+      },
+      shared: ["react", "react-dom", "react-router-dom"],
+    }),
+  ],
+});
 ```
 
-### Pub/Sub via Event Bus
+---
+
+## 15.5 Communication Strategies — Complete Guide
+
+### Strategy 1: Custom DOM Events (Loosest Coupling)
+
+Best for: fire-and-forget notifications between MFEs that don't share a framework.
 
 ```js
-// Shared event bus library
+// ---- PUBLISHER (mfe-auth) ----
+function publishEvent(name, detail) {
+  window.dispatchEvent(new CustomEvent(name, { detail, bubbles: true }));
+}
+
+// After successful login:
+publishEvent("mfe:user:login", {
+  userId: "u123",
+  name: "Alice",
+  token: "eyJ...", // or don't pass sensitive data — just signal the event
+  roles: ["user", "admin"],
+});
+
+// After logout:
+publishEvent("mfe:user:logout", {});
+```
+
+```js
+// ---- SUBSCRIBER (mfe-cart) ----
+function onUserLogin(handler) {
+  const listener = (e) => handler(e.detail);
+  window.addEventListener("mfe:user:login", listener);
+  return () => window.removeEventListener("mfe:user:login", listener); // cleanup
+}
+
+// In React component:
+useEffect(() => {
+  const unsubscribe = onUserLogin(({ userId }) => {
+    fetchCartForUser(userId);
+  });
+  return unsubscribe;
+}, []);
+```
+
+### Strategy 2: Shared Event Bus (Typed, Centralized)
+
+Best for: bidirectional communication with guaranteed delivery.
+
+```js
+// shared-event-bus/index.js  (npm package shared by all MFEs)
+
 class EventBus {
-  constructor() {
-    this.listeners = {};
+  #listeners = new Map();
+
+  on(event, handler) {
+    if (!this.#listeners.has(event)) {
+      this.#listeners.set(event, new Set());
+    }
+    this.#listeners.get(event).add(handler);
+    // Return unsubscribe function
+    return () => this.#listeners.get(event)?.delete(handler);
   }
 
-  on(event, callback) {
-    (this.listeners[event] ??= []).push(callback);
-    return () => this.off(event, callback);
+  once(event, handler) {
+    const wrapper = (data) => {
+      handler(data);
+      unsubscribe();
+    };
+    const unsubscribe = this.on(event, wrapper);
+    return unsubscribe;
   }
 
   emit(event, data) {
-    this.listeners[event]?.forEach((cb) => cb(data));
+    this.#listeners.get(event)?.forEach((h) => {
+      try {
+        h(data);
+      } catch (e) {
+        console.error(`EventBus error [${event}]:`, e);
+      }
+    });
   }
 
-  off(event, callback) {
-    this.listeners[event] = this.listeners[event]?.filter(
-      (cb) => cb !== callback
-    );
+  off(event, handler) {
+    this.#listeners.get(event)?.delete(handler);
+  }
+
+  clear(event) {
+    if (event) this.#listeners.delete(event);
+    else this.#listeners.clear();
   }
 }
 
-// Exposed as a singleton on window (or via shared module)
-window.__eventBus = window.__eventBus ?? new EventBus();
+// Singleton — all MFEs get the same instance via window
+window.__MFE_BUS__ = window.__MFE_BUS__ ?? new EventBus();
+export const bus = window.__MFE_BUS__;
+
+// Typed event catalog
+export const EVENTS = {
+  USER_LOGIN: "user:login",
+  USER_LOGOUT: "user:logout",
+  CART_UPDATED: "cart:updated",
+  CART_ITEM_ADDED: "cart:item:added",
+  PRODUCT_VIEWED: "product:viewed",
+  CHECKOUT_STARTED: "checkout:started",
+  CHECKOUT_DONE: "checkout:completed",
+};
+```
+
+```js
+// mfe-cart usage:
+import { bus, EVENTS } from "@myorg/shared-event-bus";
+
+bus.on(EVENTS.USER_LOGIN, ({ userId }) => fetchCart(userId));
+bus.on(EVENTS.CART_ITEM_ADDED, ({ product, qty }) => updateCartBadge(qty));
+
+// Emit from mfe-catalog:
+bus.emit(EVENTS.CART_ITEM_ADDED, { product, qty: 1 });
+```
+
+### Strategy 3: Shared State via Redux / Zustand (Tightest Coupling)
+
+Best for: MFEs built by same team sharing complex state; Module Federation shared instance.
+
+```js
+// @myorg/shared-store (exposed via Module Federation)
+import { configureStore, createSlice } from "@reduxjs/toolkit";
+
+const authSlice = createSlice({
+  name: "auth",
+  initialState: { user: null, token: null },
+  reducers: {
+    login: (state, { payload }) => {
+      state.user = payload.user;
+      state.token = payload.token;
+    },
+    logout: (state) => {
+      state.user = null;
+      state.token = null;
+    },
+  },
+});
+
+export const { login, logout } = authSlice.actions;
+
+export const sharedStore = configureStore({
+  reducer: { auth: authSlice.reducer },
+});
+```
+
+```js
+// webpack.config.js of shell — expose shared store
+exposes: {
+  "./store": "./src/shared-store",
+},
+
+// mfe-cart imports it:
+import { sharedStore } from "shell/store";
+const token = sharedStore.getState().auth.token;
+```
+
+### Strategy 4: URL / Query Params (Stateless, Bookmarkable)
+
+Best for: passing data between routes without tight coupling.
+
+```js
+// mfe-catalog: user selects filters → update URL
+const navigate = useNavigate();
+navigate("/products?category=shoes&minPrice=50&sort=popular");
+
+// mfe-search: reads same URL params
+const [params] = useSearchParams();
+const category = params.get("category"); // "shoes"
+const sort = params.get("sort"); // "popular"
+```
+
+### Strategy 5: Props / Callbacks from Shell (Parent → Child)
+
+Best for: shell passing config, user context, or callbacks to MFEs.
+
+```jsx
+// Shell passes user context and callbacks as props to MFE components
+<CatalogApp
+  user={currentUser}
+  onAddToCart={(product) => cartService.add(product)}
+  onNavigate={(path) => navigate(path)}
+  config={{ currency: "USD", locale: "en-US" }}
+/>
+```
+
+### Communication Strategy Decision Matrix
+
+| Need                                | Best Strategy                              |
+| ----------------------------------- | ------------------------------------------ |
+| Auth state everywhere               | Shared Store (Redux) via Module Federation |
+| Cart count in navbar                | Custom DOM Event or Event Bus              |
+| Navigation between MFEs             | URL / React Router in Shell                |
+| MFE notifies shell (modal, error)   | Custom DOM Event                           |
+| Real-time sync (like notifications) | WebSocket in shell + Event Bus to MFEs     |
+| Config (env, feature flags)         | Props from shell or shared config module   |
+| Cross-MFE form state                | URL params or Shared Store                 |
+
+---
+
+## 15.6 Routing in Micro Frontends
+
+### Shell Owns Top-Level Routes
+
+```jsx
+// Shell routes to MFE apps based on path prefix
+<Routes>
+  <Route path="/auth/*" element={<AuthMFE />} />
+  <Route path="/products/*" element={<CatalogMFE />} />
+  <Route path="/cart/*" element={<CartMFE />} />
+  <Route path="/account/*" element={<AccountMFE />} />
+</Routes>
+```
+
+### Each MFE Has Its Own Sub-Router
+
+```jsx
+// mfe-catalog/src/App.jsx
+// baseName comes from shell as a prop
+function CatalogApp({ baseName = "/products" }) {
+  return (
+    <BrowserRouter basename={baseName}>
+      <Routes>
+        <Route path="/" element={<ProductListPage />} />
+        <Route path="/:id" element={<ProductDetailPage />} />
+        <Route path="/category/:slug" element={<CategoryPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+// Final URLs: /products/, /products/123, /products/category/shoes
+```
+
+### Cross-MFE Navigation
+
+```js
+// ❌ Don't import router from another MFE
+// ✅ Use window.history or a navigation event
+
+// Option 1: Direct history API
+window.history.pushState({}, "", "/cart");
+window.dispatchEvent(new PopStateEvent("popstate")); // notify shell router
+
+// Option 2: Navigation event via bus
+bus.emit("shell:navigate", { path: "/cart", state: { from: "catalog" } });
+
+// Shell listens and uses its own navigate():
+bus.on("shell:navigate", ({ path }) => shellNavigate(path));
 ```
 
 ---
 
-## 15.4 Single-SPA
+## 15.7 Deployment Strategies
 
-Single-SPA is a JavaScript framework for micro frontends that routes between multiple frameworks.
+### Strategy A — Independent Deploys (Most Common)
+
+Each MFE has its own CI/CD. The shell references MFEs by URL.
+
+```
+Merge to main (mfe-catalog)
+        │
+        ▼
+CI: install → test → build → upload to CDN
+        │
+        ▼
+CDN: catalog.cdn.example.com/remoteEntry.js  (updated in-place)
+        │
+        ▼
+Shell loads the NEW catalog automatically on next page load
+(no shell redeploy needed!)
+```
+
+```yaml
+# .github/workflows/deploy-mfe-catalog.yml
+name: Deploy mfe-catalog
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20", cache: "npm" }
+
+      - run: npm ci
+      - run: npm test -- --ci
+      - run: npm run build
+
+      - name: Upload to S3 (CDN origin)
+        run: |
+          aws s3 sync dist/ s3://myapp-mfe-catalog/ --delete \
+            --cache-control "max-age=31536000,immutable" \
+            --exclude "remoteEntry.js"
+          # remoteEntry.js is NOT cached (must always get latest)
+          aws s3 cp dist/remoteEntry.js s3://myapp-mfe-catalog/remoteEntry.js \
+            --cache-control "no-cache, no-store, must-revalidate"
+
+      - name: Invalidate CDN for remoteEntry.js
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id $CF_DIST_ID \
+            --paths "/remoteEntry.js"
+        env:
+          CF_DIST_ID: ${{ secrets.MFE_CATALOG_CF_DIST }}
+```
+
+### Strategy B — Versioned Deploys (Zero-Risk)
+
+Shell pins to a specific version URL. You control when to upgrade.
+
+```
+CDN layout:
+catalog.cdn.example.com/
+  v1.2.3/remoteEntry.js    ← old version still serving
+  v1.2.4/remoteEntry.js    ← new version deployed
+  v1.2.5/remoteEntry.js    ← latest
+
+Shell config (env var):
+CATALOG_MFE_URL=https://catalog.cdn.example.com/v1.2.5/remoteEntry.js
+```
 
 ```js
-// root-config.js
+// Shell webpack.config.js — URL from environment
+remotes: {
+  mfeCatalog: `mfeCatalog@${process.env.CATALOG_MFE_URL}`,
+  mfeCart:    `mfeCart@${process.env.CART_MFE_URL}`,
+},
+```
+
+### Strategy C — Feature Flags per MFE Version
+
+```js
+// Remote URL served by a feature flag service
+async function getMFEConfig() {
+  const flags = await fetch("/api/feature-flags").then((r) => r.json());
+  return {
+    catalogUrl: flags["catalog-mfe-v2"]
+      ? "https://cdn.example.com/catalog/v2/remoteEntry.js"
+      : "https://cdn.example.com/catalog/v1/remoteEntry.js",
+  };
+}
+```
+
+### Deployment Architecture Diagram
+
+```
+Developer pushes to mfe-catalog main
+          │
+          ▼
+GitHub Actions CI
+  ├── npm test
+  ├── npm run build
+  └── Upload to S3 bucket: s3://myapp-mfe-catalog/
+          │
+          ▼
+CloudFront CDN
+  URL: catalog.cdn.myapp.com/remoteEntry.js
+          │
+          ▼
+Shell App (shell.myapp.com)
+  webpack remote: "mfeCatalog@catalog.cdn.myapp.com/remoteEntry.js"
+          │
+          ▼
+Browser loads shell → shell fetches remoteEntry.js from CDN
+  → catalog code executes in browser as if it was part of shell
+```
+
+### Key CDN Caching Rules
+
+```
+remoteEntry.js        → Cache-Control: no-store    (always fresh)
+main.[hash].js        → Cache-Control: max-age=31536000, immutable
+[chunk].[hash].js     → Cache-Control: max-age=31536000, immutable
+assets/[img].[hash]   → Cache-Control: max-age=31536000, immutable
+```
+
+---
+
+## 15.8 Single-SPA — Full Setup
+
+Single-SPA is a framework for combining multiple SPAs on one page with proper lifecycle management.
+
+```bash
+npx create-single-spa
+# Choose: single-spa root config
+```
+
+```js
+// root-config/src/myorg-root-config.js
 import { registerApplication, start } from "single-spa";
+import {
+  constructApplications,
+  constructRoutes,
+  constructLayoutEngine,
+} from "single-spa-layout";
 
-registerApplication({
-  name: "@myorg/navbar",
-  app: () => import("@myorg/navbar"),
-  activeWhen: ["/"], // active on all routes
+// Declare the layout in HTML (declarative routing)
+const routes = constructRoutes(`
+  <single-spa-router>
+    <application name="@myorg/navbar"></application>
+    <route path="/auth">
+      <application name="@myorg/auth"></application>
+    </route>
+    <route path="/products">
+      <application name="@myorg/catalog"></application>
+    </route>
+    <route path="/cart">
+      <application name="@myorg/cart"></application>
+    </route>
+  </single-spa-router>
+`);
+
+const applications = constructApplications({
+  routes,
+  loadApp: ({ name }) => System.import(name), // uses SystemJS import maps
 });
 
-registerApplication({
-  name: "@myorg/products",
-  app: () => import("@myorg/products"),
-  activeWhen: "/products",
+const layoutEngine = constructLayoutEngine({ routes, applications });
+
+applications.forEach(registerApplication);
+layoutEngine.activate();
+start({ urlRerouteOnly: true });
+```
+
+```html
+<!-- index.html — SystemJS import map points to MFE bundles -->
+<script type="systemjs-importmap">
+  {
+    "imports": {
+      "@myorg/root-config": "//localhost:9000/myorg-root-config.js",
+      "@myorg/navbar": "//localhost:8080/myorg-navbar.js",
+      "@myorg/auth": "//localhost:8081/myorg-auth.js",
+      "@myorg/catalog": "//localhost:8082/myorg-catalog.js",
+      "@myorg/cart": "//localhost:8083/myorg-cart.js",
+      "react": "//cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js",
+      "react-dom": "//cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"
+    }
+  }
+</script>
+```
+
+### MFE Lifecycle (Single-SPA Required Exports)
+
+```jsx
+// mfe-catalog/src/root.component.jsx
+export default function Root({ name }) {
+  return <CatalogApp />;
+}
+
+// mfe-catalog/src/myorg-catalog.jsx
+import React from "react";
+import ReactDOM from "react-dom/client";
+import singleSpaReact from "single-spa-react";
+import Root from "./root.component";
+
+const lifecycles = singleSpaReact({
+  React,
+  ReactDOM,
+  rootComponent: Root,
+  errorBoundary: (err) => <div>Catalog failed to load: {err.message}</div>,
 });
 
-registerApplication({
-  name: "@myorg/checkout",
-  app: () => import("@myorg/checkout"),
-  activeWhen: "/checkout",
-});
-
-start();
+// single-spa expects these exact named exports
+export const { bootstrap, mount, unmount } = lifecycles;
 ```
 
 ---
 
-## 15.5 Version Management & Shared Dependencies
+## 15.9 Web Components — Framework-Agnostic MFEs
 
-### Strategy: Singleton Sharing
+Use when teams use different frameworks (React + Vue + Angular).
 
 ```js
-// In Module Federation, mark React as singleton:
-shared: {
-  react: {
-    singleton: true,         // only one instance loaded
-    requiredVersion: '^18.0.0', // warn if version mismatch
-    eager: true,             // load immediately, not lazily
+// mfe-catalog — exposed as a Web Component
+class CatalogWidget extends HTMLElement {
+  #root = null;
+  #unmount = null;
+
+  connectedCallback() {
+    // Attributes become props
+    const category = this.getAttribute("category") ?? "all";
+    this.#root = document.createElement("div");
+    this.appendChild(this.#root);
+
+    // Mount React inside the custom element
+    import("./catalog-app").then(({ mount }) => {
+      this.#unmount = mount(this.#root, { category });
+    });
+  }
+
+  disconnectedCallback() {
+    this.#unmount?.(); // clean up React tree
+  }
+
+  // Observe attribute changes
+  static get observedAttributes() {
+    return ["category"];
+  }
+  attributeChangedCallback(name, oldVal, newVal) {
+    if (name === "category" && this.#root) {
+      // Re-mount or update props
+    }
   }
 }
 
-// Without singleton: 3 MFEs = 3 React instances = hooks break!
+customElements.define("catalog-widget", CatalogWidget);
 ```
 
-### Strategy: Design System Package
-
+```html
+<!-- Used in shell (framework-agnostic!) -->
+<catalog-widget category="shoes"></catalog-widget>
+<cart-widget user-id="u123"></cart-widget>
 ```
-@myorg/design-system (npm package)
-    ↓ consumed by
-├── @myorg/shell
-├── @myorg/products
-└── @myorg/cart
-```
-
-All MFEs share the same design system version. Upgrade in one place.
 
 ---
 
-## 15.6 Real-World Examples
+## 15.10 Shared Dependencies & Design System
 
-**Amazon:** Different teams own different page sections. Product listing, recommendations, cart, and checkout are separate deployments.
+### Design System as Shared npm Package
 
-**Spotify:** Web player, browse, search, and podcast sections built and deployed by different teams.
+```bash
+# Publish design system
+cd packages/design-system
+npm publish --access public
 
-**IKEA:** Planner tool, product catalog, and checkout are separate micro frontends with different tech stacks per team.
+# All MFEs consume it
+npm install @myorg/design-system
+```
+
+```jsx
+// All MFEs use same tokens, components
+import { Button, Card, Typography, tokens } from "@myorg/design-system";
+
+function ProductCard({ product }) {
+  return (
+    <Card elevation={2}>
+      <Typography variant="h3">{product.name}</Typography>
+      <Button variant="primary" onClick={onAddToCart}>
+        Add to Cart
+      </Button>
+    </Card>
+  );
+}
+```
+
+### Shared Utilities Package
+
+```
+@myorg/shared-utils
+  ├── auth.js         ← getToken(), isLoggedIn(), refreshToken()
+  ├── analytics.js    ← trackEvent(), trackPageView()
+  ├── errorTracking.js ← captureException() (Sentry wrapper)
+  ├── http.js         ← configured axios instance with interceptors
+  └── eventBus.js     ← shared event bus
+```
 
 ---
 
-## 15.7 Micro Frontend Interview Questions
+## 15.11 Testing Micro Frontends
+
+### Unit + Integration — Same as Normal React
+
+Each MFE is tested in isolation like a normal React app:
+
+```bash
+cd mfe-catalog && npm test
+```
+
+### Contract Testing (Pact.js)
+
+Ensure the shell and MFE agree on the interface:
+
+```js
+// Shell is the consumer — defines what it expects from mfe-catalog
+const { Pact } = require("@pact-foundation/pact");
+
+const provider = new Pact({ consumer: "shell", provider: "mfe-catalog" });
+
+describe("mfe-catalog contract", () => {
+  it("ProductList component renders with products array prop", async () => {
+    // Define expected interaction
+    await provider.addInteraction({
+      state: "products exist",
+      uponReceiving: "a request for ProductList",
+      withRequest: { component: "ProductList", props: { products: Array } },
+      willRespondWith: { renders: true },
+    });
+  });
+});
+```
+
+### E2E — Cypress Against Composed Shell
+
+```js
+// cypress/e2e/mfe-integration.cy.js
+// Shell loads all MFEs — test the composed app
+describe("Product to Cart flow (cross-MFE)", () => {
+  it("adds product from catalog and sees it in cart", () => {
+    cy.visit("/products");
+
+    // catalog MFE
+    cy.findByText("Nike Air Max")
+      .closest('[data-testid="product-card"]')
+      .findByRole("button", { name: /add to cart/i })
+      .click();
+
+    // Cart badge in shell navbar updates
+    cy.findByRole("status", { name: /cart count/i }).should("contain", "1");
+
+    // cart MFE
+    cy.findByRole("link", { name: /cart/i }).click();
+    cy.url().should("include", "/cart");
+    cy.findByText("Nike Air Max").should("exist");
+  });
+});
+```
+
+---
+
+## 15.12 Micro Frontend Interview Questions
+
+**Q: How do you decide what to split into a micro frontend?**
+
+> Split by **business domain**, not technical layer. A good heuristic: if two features have different team ownership, different deploy frequency, or independent business value — they're candidates for separate MFEs. Avoid splitting purely for technical reasons (e.g., "all forms in one MFE"). The cost of splitting must be justified by team autonomy gains.
 
 **Q: What are the main challenges of micro frontends?**
 
-> 1. **Bundle duplication**: Shared libraries (React, design system) loaded multiple times. Mitigate with Module Federation `shared` config. 2. **Routing conflicts**: Multiple routers in the same page. Use the shell for top-level routing. 3. **Authentication**: Session must be accessible across MFEs — use shared cookie or custom event. 4. **Design consistency**: Enforce a shared design system package. 5. **Performance**: MFEs load sequentially causing waterfalls — mitigate with preloading.
+> 1. **Bundle duplication** — multiple React copies without Module Federation `shared` singleton. 2. **Routing conflicts** — two History routers clash. Fix: shell owns top-level routing, MFEs use sub-routers with `basename`. 3. **Auth state sharing** — use shared store via MF or HttpOnly cookie accessible to all MFEs. 4. **Design inconsistency** — enforce via shared npm design system package. 5. **Cross-MFE debugging** — hard to trace bugs across app boundaries; add correlation IDs.
 
-**Q: How to share React version across MFEs?**
+**Q: How does Module Federation differ from npm packages for sharing code?**
 
-> Use Webpack Module Federation's `shared` config with `singleton: true`. This ensures only one instance of React is loaded regardless of how many MFEs request it. All MFEs must have compatible version ranges.
+> npm packages are shared at **build time** — every MFE bundles its own copy unless the shared config deduplicates. Changes require republish + install + rebuild all consumers. Module Federation shares at **runtime** — all MFEs in the same page share one instance from the network. Updates to a remote are available on next page load with zero changes to consumers.
 
-**Q: How do deployments work in Micro Frontends?**
+**Q: How do you handle authentication across MFEs?**
 
-> Each MFE has its own CI/CD pipeline. Changes in one MFE trigger only that MFE's build and deploy. The host app references remote MFEs by URL — either pinned version URLs (`remoteEntry.v1.2.3.js`) for stability or latest URLs (`remoteEntry.js`) for continuous deployment.
+> The recommended pattern: Auth MFE handles login and stores the **access token in memory** (not localStorage). Refresh token in an **HttpOnly cookie** (accessible to server, invisible to JS). Other MFEs get the access token via: (1) shared Redux store via Module Federation, (2) custom event from auth MFE after login, or (3) each MFE calls a `/api/auth/token` endpoint that reads the HttpOnly cookie and returns the current token.
+
+**Q: Why must `remoteEntry.js` never be CDN-cached?**
+
+> `remoteEntry.js` is the manifest — it maps module names to their hashed chunk filenames. If it's cached, the shell loads a stale manifest and tries to fetch chunks that may have been replaced (404). All other chunks have content-hash filenames and can be cached forever (`immutable`). `remoteEntry.js` gets `Cache-Control: no-store`.
+
+**Q: What is the difference between Build-time and Runtime integration?**
+
+> **Build-time** (npm packages): MFEs are published as npm packages, consumed at build time. All code ends up in one final bundle. Deployments require rebuilding the shell to get updates. Simple but defeats independent deploys. **Runtime** (Module Federation / Single-SPA): MFEs are loaded dynamically from CDN at runtime. Each MFE deploys independently — the shell gets updates automatically. This is the true micro frontend model.
+
+**Q: How do you prevent one broken MFE from crashing the entire shell?**
+
+> Wrap every remote import in an **Error Boundary** + **Suspense**. If the network request for `remoteEntry.js` fails, or if the remote component throws, the Error Boundary catches it and shows a fallback UI. The rest of the shell (nav, other MFEs) continues working. Also implement **health checks** — shell can ping MFE health endpoints before loading them.
 
 ---
 

@@ -55,10 +55,10 @@ Store (single source of truth)
 
 ### Three Core Principles
 
-| Principle | Meaning |
-|-----------|---------|
-| **Single source of truth** | The whole app state lives in one store |
-| **State is read-only** | You can only change state by dispatching actions |
+| Principle                      | Meaning                                                       |
+| ------------------------------ | ------------------------------------------------------------- |
+| **Single source of truth**     | The whole app state lives in one store                        |
+| **State is read-only**         | You can only change state by dispatching actions              |
 | **Changes via pure functions** | Reducers are pure — same input → same output, no side effects |
 
 ### When to Use Redux
@@ -92,7 +92,7 @@ npm install redux react-redux
 // store/actionTypes.js
 export const INCREMENT = "counter/INCREMENT";
 export const DECREMENT = "counter/DECREMENT";
-export const ADD_TODO  = "todos/ADD_TODO";
+export const ADD_TODO = "todos/ADD_TODO";
 export const TOGGLE_TODO = "todos/TOGGLE_TODO";
 export const DELETE_TODO = "todos/DELETE_TODO";
 ```
@@ -101,7 +101,13 @@ export const DELETE_TODO = "todos/DELETE_TODO";
 
 ```js
 // store/actions.js
-import { INCREMENT, DECREMENT, ADD_TODO, TOGGLE_TODO, DELETE_TODO } from "./actionTypes";
+import {
+  INCREMENT,
+  DECREMENT,
+  ADD_TODO,
+  TOGGLE_TODO,
+  DELETE_TODO,
+} from "./actionTypes";
 
 export const increment = () => ({ type: INCREMENT });
 export const decrement = () => ({ type: DECREMENT });
@@ -133,11 +139,11 @@ const initialState = { count: 0 };
 export function counterReducer(state = initialState, action) {
   switch (action.type) {
     case INCREMENT:
-      return { ...state, count: state.count + 1 };   // MUST return new object!
+      return { ...state, count: state.count + 1 }; // MUST return new object!
     case DECREMENT:
       return { ...state, count: state.count - 1 };
     default:
-      return state;  // Always return state for unknown actions
+      return state; // Always return state for unknown actions
   }
 }
 ```
@@ -151,12 +157,12 @@ const initialState = [];
 export function todosReducer(state = initialState, action) {
   switch (action.type) {
     case ADD_TODO:
-      return [...state, action.payload];   // new array, don't push!
+      return [...state, action.payload]; // new array, don't push!
 
     case TOGGLE_TODO:
       return state.map((todo) =>
         todo.id === action.payload
-          ? { ...todo, completed: !todo.completed }  // new object!
+          ? { ...todo, completed: !todo.completed } // new object!
           : todo
       );
 
@@ -184,7 +190,7 @@ const rootReducer = combineReducers({
 
 export const store = createStore(
   rootReducer,
-  window.__REDUX_DEVTOOLS_EXTENSION__?.()  // enable Redux DevTools
+  window.__REDUX_DEVTOOLS_EXTENSION__?.() // enable Redux DevTools
 );
 ```
 
@@ -238,16 +244,21 @@ export function TodoList() {
   return (
     <div>
       <input value={text} onChange={(e) => setText(e.target.value)} />
-      <button onClick={() => { dispatch(addTodo(text)); setText(""); }}>
+      <button
+        onClick={() => {
+          dispatch(addTodo(text));
+          setText("");
+        }}>
         Add
       </button>
       <ul>
         {todos.map((todo) => (
           <li key={todo.id}>
             <span
-              style={{ textDecoration: todo.completed ? "line-through" : "none" }}
-              onClick={() => dispatch(toggleTodo(todo.id))}
-            >
+              style={{
+                textDecoration: todo.completed ? "line-through" : "none",
+              }}
+              onClick={() => dispatch(toggleTodo(todo.id))}>
               {todo.text}
             </span>
             <button onClick={() => dispatch(deleteTodo(todo.id))}>✕</button>
@@ -262,6 +273,7 @@ export function TodoList() {
 ### The Boilerplate Problem (Why RTK Exists)
 
 Plain Redux requires you to:
+
 1. Manually define action type constants
 2. Manually write action creators
 3. Write `switch` statements in reducers
@@ -307,10 +319,7 @@ const thunkMiddleware = (store) => (next) => (action) => {
 ```js
 import { createStore, applyMiddleware } from "redux";
 
-const store = createStore(
-  rootReducer,
-  applyMiddleware(thunkMiddleware)
-);
+const store = createStore(rootReducer, applyMiddleware(thunkMiddleware));
 ```
 
 ### Using Thunk (Plain Redux)
@@ -358,14 +367,14 @@ npm install @reduxjs/toolkit react-redux
 
 ### What RTK Provides
 
-| RTK API | Replaces |
-|---------|----------|
-| `configureStore` | `createStore` + `applyMiddleware` + DevTools setup |
-| `createSlice` | action types + action creators + reducer |
-| `createAsyncThunk` | manual thunk functions |
-| `createEntityAdapter` | normalized state helpers |
-| `createSelector` | memoized selectors (Reselect) |
-| `createApi` (RTK Query) | all data fetching + caching logic |
+| RTK API                 | Replaces                                           |
+| ----------------------- | -------------------------------------------------- |
+| `configureStore`        | `createStore` + `applyMiddleware` + DevTools setup |
+| `createSlice`           | action types + action creators + reducer           |
+| `createAsyncThunk`      | manual thunk functions                             |
+| `createEntityAdapter`   | normalized state helpers                           |
+| `createSelector`        | memoized selectors (Reselect)                      |
+| `createApi` (RTK Query) | all data fetching + caching logic                  |
 
 ### configureStore
 
@@ -392,6 +401,7 @@ export type AppDispatch = typeof store.dispatch;
 ```
 
 **What `configureStore` does automatically:**
+
 - Adds `redux-thunk` middleware
 - Adds Redux DevTools Extension support
 - Adds development-only checks (serializable state, immutability)
@@ -409,7 +419,7 @@ A **slice** is a self-contained unit of Redux state — it combines the reducer 
 import { createSlice } from "@reduxjs/toolkit";
 
 const counterSlice = createSlice({
-  name: "counter",           // used as prefix for action types
+  name: "counter", // used as prefix for action types
   initialState: {
     value: 0,
     step: 1,
@@ -419,7 +429,7 @@ const counterSlice = createSlice({
   reducers: {
     // Simple reducer
     increment(state) {
-      state.value += state.step;  // Immer allows direct mutation!
+      state.value += state.step; // Immer allows direct mutation!
       state.history.push(state.value);
     },
 
@@ -461,12 +471,18 @@ const counterSlice = createSlice({
 });
 
 // Actions are auto-generated
-export const { increment, decrement, incrementByAmount, setStep, reset, addWithMeta } =
-  counterSlice.actions;
+export const {
+  increment,
+  decrement,
+  incrementByAmount,
+  setStep,
+  reset,
+  addWithMeta,
+} = counterSlice.actions;
 
 // Action types (for reference or testing)
-console.log(increment.type);           // "counter/increment"
-console.log(incrementByAmount.type);  // "counter/incrementByAmount"
+console.log(increment.type); // "counter/increment"
+console.log(incrementByAmount.type); // "counter/incrementByAmount"
 
 // Reducer
 export default counterSlice.reducer;
@@ -482,7 +498,7 @@ const todosSlice = createSlice({
   name: "todos",
   initialState: {
     items: [],
-    filter: "all",   // "all" | "active" | "completed"
+    filter: "all", // "all" | "active" | "completed"
   },
 
   reducers: {
@@ -493,7 +509,7 @@ const todosSlice = createSlice({
       prepare(text) {
         return {
           payload: {
-            id: nanoid(),     // RTK provides nanoid!
+            id: nanoid(), // RTK provides nanoid!
             text,
             completed: false,
             createdAt: Date.now(),
@@ -505,7 +521,7 @@ const todosSlice = createSlice({
     toggleTodo(state, action) {
       const todo = state.items.find((t) => t.id === action.payload);
       if (todo) {
-        todo.completed = !todo.completed;  // direct mutation via Immer
+        todo.completed = !todo.completed; // direct mutation via Immer
       }
     },
 
@@ -529,8 +545,14 @@ const todosSlice = createSlice({
   },
 });
 
-export const { addTodo, toggleTodo, deleteTodo, editTodo, setFilter, clearCompleted } =
-  todosSlice.actions;
+export const {
+  addTodo,
+  toggleTodo,
+  deleteTodo,
+  editTodo,
+  setFilter,
+  clearCompleted,
+} = todosSlice.actions;
 export default todosSlice.reducer;
 ```
 
@@ -590,11 +612,11 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 // 1. Create the async thunk
 export const fetchUserById = createAsyncThunk(
-  "users/fetchById",           // action type prefix
+  "users/fetchById", // action type prefix
   async (userId, thunkAPI) => {
     const response = await fetch(`/api/users/${userId}`);
     const data = await response.json();
-    return data;  // becomes action.payload in fulfilled
+    return data; // becomes action.payload in fulfilled
   }
 );
 
@@ -603,7 +625,7 @@ const usersSlice = createSlice({
   name: "users",
   initialState: {
     entities: {},
-    loading: "idle",  // "idle" | "pending" | "succeeded" | "failed"
+    loading: "idle", // "idle" | "pending" | "succeeded" | "failed"
     error: null,
     currentRequestId: null,
   },
@@ -620,7 +642,10 @@ const usersSlice = createSlice({
       })
       .addCase(fetchUserById.fulfilled, (state, action) => {
         const { requestId } = action.meta;
-        if (state.loading === "pending" && state.currentRequestId === requestId) {
+        if (
+          state.loading === "pending" &&
+          state.currentRequestId === requestId
+        ) {
           state.loading = "idle";
           state.entities[action.payload.id] = action.payload;
         }
@@ -644,12 +669,12 @@ export const fetchCartWithAuth = createAsyncThunk(
   "cart/fetchWithAuth",
   async (_, thunkAPI) => {
     const {
-      dispatch,     // dispatch other actions
-      getState,     // read current state
-      rejectWithValue,  // return a known error payload
+      dispatch, // dispatch other actions
+      getState, // read current state
+      rejectWithValue, // return a known error payload
       fulfillWithValue, // return a success payload with meta
-      signal,       // AbortController signal for cancellation
-      extra,        // injected extra argument (e.g. API service)
+      signal, // AbortController signal for cancellation
+      extra, // injected extra argument (e.g. API service)
     } = thunkAPI;
 
     // Access other slice state
@@ -661,7 +686,7 @@ export const fetchCartWithAuth = createAsyncThunk(
     try {
       const response = await fetch("/api/cart", {
         headers: { Authorization: `Bearer ${token}` },
-        signal,   // supports abort!
+        signal, // supports abort!
       });
 
       if (!response.ok) {
@@ -689,7 +714,7 @@ extraReducers: (builder) => {
     // action.payload        — for rejectWithValue (your custom message)
     state.error = action.payload ?? action.error.message;
   });
-}
+};
 ```
 
 ### Cancelling a Request
@@ -701,7 +726,7 @@ function SearchResults({ query }) {
   useEffect(() => {
     const promise = dispatch(searchProducts(query));
     return () => {
-      promise.abort();  // createAsyncThunk supports .abort() on the returned promise
+      promise.abort(); // createAsyncThunk supports .abort() on the returned promise
     };
   }, [query]);
 }
@@ -764,7 +789,11 @@ entities: {
 ### Full Example
 
 ```js
-import { createSlice, createEntityAdapter, createAsyncThunk } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  createEntityAdapter,
+  createAsyncThunk,
+} from "@reduxjs/toolkit";
 
 // 1. Create adapter
 const productsAdapter = createEntityAdapter({
@@ -796,11 +825,11 @@ const productsSlice = createSlice({
     addMany: productsAdapter.addMany,
     updateOne: productsAdapter.updateOne,
     updateMany: productsAdapter.updateMany,
-    upsertOne: productsAdapter.upsertOne,    // add or update
+    upsertOne: productsAdapter.upsertOne, // add or update
     upsertMany: productsAdapter.upsertMany,
     removeOne: productsAdapter.removeOne,
     removeMany: productsAdapter.removeMany,
-    setAll: productsAdapter.setAll,          // replace entire list
+    setAll: productsAdapter.setAll, // replace entire list
 
     // Custom reducer using adapter methods
     updatePrice(state, action) {
@@ -846,7 +875,13 @@ function ProductList() {
   const product = useSelector((state) => selectProductById(state, "abc123"));
   const total = useSelector(selectProductCount);
 
-  return <div>{products.map(p => <ProductCard key={p.id} product={p} />)}</div>;
+  return (
+    <div>
+      {products.map((p) => (
+        <ProductCard key={p.id} product={p} />
+      ))}
+    </div>
+  );
 }
 ```
 
@@ -879,22 +914,22 @@ export const selectFilteredTodos = createSelector(
   [selectTodoItems, selectFilter],
   (items, filter) => {
     switch (filter) {
-      case "active":    return items.filter((t) => !t.completed);
-      case "completed": return items.filter((t) => t.completed);
-      default:          return items;
+      case "active":
+        return items.filter((t) => !t.completed);
+      case "completed":
+        return items.filter((t) => t.completed);
+      default:
+        return items;
     }
   }
 );
 
 // Multiple inputs
-export const selectTodoStats = createSelector(
-  [selectTodoItems],
-  (items) => ({
-    total: items.length,
-    active: items.filter((t) => !t.completed).length,
-    completed: items.filter((t) => t.completed).length,
-  })
-);
+export const selectTodoStats = createSelector([selectTodoItems], (items) => ({
+  total: items.length,
+  active: items.filter((t) => !t.completed).length,
+  completed: items.filter((t) => t.completed).length,
+}));
 ```
 
 ### Parameterized Selectors (Factory Pattern)
@@ -902,9 +937,8 @@ export const selectTodoStats = createSelector(
 ```js
 // Selector that takes an argument
 export const makeSelectTodoById = () =>
-  createSelector(
-    [(state) => state.todos.items, (_, id) => id],
-    (items, id) => items.find((t) => t.id === id)
+  createSelector([(state) => state.todos.items, (_, id) => id], (items, id) =>
+    items.find((t) => t.id === id)
   );
 
 // Usage — each component instance gets its own memoized selector
@@ -938,13 +972,13 @@ npm install @reduxjs/toolkit react-redux
 
 ### Why RTK Query?
 
-| Without RTK Query | With RTK Query |
-|-------------------|----------------|
-| Manual loading/error state | Automatic `isLoading`, `isError` |
-| Manual cache management | Automatic caching by endpoint + args |
-| Duplicate requests | Auto-deduplication |
-| Manual refetch on mutations | Auto-invalidation via tags |
-| useEffect + fetch boilerplate | Single hook call |
+| Without RTK Query             | With RTK Query                       |
+| ----------------------------- | ------------------------------------ |
+| Manual loading/error state    | Automatic `isLoading`, `isError`     |
+| Manual cache management       | Automatic caching by endpoint + args |
+| Duplicate requests            | Auto-deduplication                   |
+| Manual refetch on mutations   | Auto-invalidation via tags           |
+| useEffect + fetch boilerplate | Single hook call                     |
 
 ### Step 1 — Create an API Slice
 
@@ -1052,10 +1086,10 @@ import authReducer from "./authSlice";
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    [postsApi.reducerPath]: postsApi.reducer,   // RTK Query manages its own state
+    [postsApi.reducerPath]: postsApi.reducer, // RTK Query manages its own state
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(postsApi.middleware),  // required for caching!
+    getDefaultMiddleware().concat(postsApi.middleware), // required for caching!
 });
 ```
 
@@ -1067,13 +1101,13 @@ import { useGetPostsQuery, useDeletePostMutation } from "../store/api/postsApi";
 
 export function PostList() {
   const {
-    data: posts,          // the result data
-    isLoading,            // true on first load, no cached data
-    isFetching,           // true whenever fetching (including refetch)
-    isSuccess,            // true if last request succeeded
-    isError,              // true if last request failed
-    error,                // the error object
-    refetch,              // manually trigger a refetch
+    data: posts, // the result data
+    isLoading, // true on first load, no cached data
+    isFetching, // true whenever fetching (including refetch)
+    isSuccess, // true if last request succeeded
+    isError, // true if last request failed
+    error, // the error object
+    refetch, // manually trigger a refetch
   } = useGetPostsQuery();
 
   const [deletePost, { isLoading: isDeleting }] = useDeletePostMutation();
@@ -1086,10 +1120,7 @@ export function PostList() {
       {posts?.map((post) => (
         <li key={post.id}>
           {post.title}
-          <button
-            onClick={() => deletePost(post.id)}
-            disabled={isDeleting}
-          >
+          <button onClick={() => deletePost(post.id)} disabled={isDeleting}>
             Delete
           </button>
         </li>
@@ -1120,8 +1151,16 @@ export function CreatePostForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" />
-      <textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="Body" />
+      <input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Title"
+      />
+      <textarea
+        value={body}
+        onChange={(e) => setBody(e.target.value)}
+        placeholder="Body"
+      />
       <button type="submit" disabled={isLoading}>
         {isLoading ? "Saving..." : "Create Post"}
       </button>
@@ -1139,15 +1178,20 @@ import { useGetPostByIdQuery } from "../store/api/postsApi";
 export function PostDetail({ postId }) {
   const { data: post, isLoading } = useGetPostByIdQuery(postId, {
     // Options:
-    skip: !postId,               // don't fetch if postId is null
-    pollingInterval: 30_000,     // refetch every 30 seconds
-    refetchOnMountOrArgChange: true,  // always refetch on mount
-    refetchOnFocus: true,        // refetch when window regains focus
-    refetchOnReconnect: true,    // refetch on network reconnect
+    skip: !postId, // don't fetch if postId is null
+    pollingInterval: 30_000, // refetch every 30 seconds
+    refetchOnMountOrArgChange: true, // always refetch on mount
+    refetchOnFocus: true, // refetch when window regains focus
+    refetchOnReconnect: true, // refetch on network reconnect
   });
 
   if (isLoading) return <Spinner />;
-  return <article><h1>{post?.title}</h1><p>{post?.body}</p></article>;
+  return (
+    <article>
+      <h1>{post?.title}</h1>
+      <p>{post?.body}</p>
+    </article>
+  );
 }
 ```
 
@@ -1231,7 +1275,10 @@ getPostsPaged: builder.query({
 // Paginated component
 function PaginatedPosts() {
   const [page, setPage] = useState(1);
-  const { data, isLoading, isFetching } = useGetPostsPagedQuery({ page, limit: 10 });
+  const { data, isLoading, isFetching } = useGetPostsPagedQuery({
+    page,
+    limit: 10,
+  });
 
   // Prefetch next page
   const prefetchPage = usePrefetch("getPostsPaged");
@@ -1242,16 +1289,14 @@ function PaginatedPosts() {
       <button
         onClick={() => setPage((p) => p - 1)}
         disabled={page === 1 || isFetching}
-        onMouseEnter={() => prefetchPage({ page: page - 1 })}
-      >
+        onMouseEnter={() => prefetchPage({ page: page - 1 })}>
         ← Prev
       </button>
       <span>Page {page}</span>
       <button
         onClick={() => setPage((p) => p + 1)}
         disabled={isFetching}
-        onMouseEnter={() => prefetchPage({ page: page + 1 })}
-      >
+        onMouseEnter={() => prefetchPage({ page: page + 1 })}>
         Next →
       </button>
     </div>
@@ -1346,7 +1391,7 @@ dispatch(
 const prefetchPost = usePrefetch("getPostById");
 <div onMouseEnter={() => prefetchPost(post.id)}>
   <PostCard post={post} />
-</div>
+</div>;
 ```
 
 ### Polling
@@ -1354,8 +1399,8 @@ const prefetchPost = usePrefetch("getPostById");
 ```jsx
 function LiveDashboard() {
   const { data } = useGetStatsQuery(undefined, {
-    pollingInterval: 5000,    // refetch every 5 seconds
-    skipPollingIfUnfocused: true,  // pause when tab is not active
+    pollingInterval: 5000, // refetch every 5 seconds
+    skipPollingIfUnfocused: true, // pause when tab is not active
   });
   return <Stats data={data} />;
 }
@@ -1447,23 +1492,20 @@ import type { RootState, AppDispatch } from "../../app/store";
 
 // Specify types: [ReturnType, ArgType, ThunkAPIConfig]
 export const fetchUserById = createAsyncThunk<
-  User,              // return type
-  string,            // argument type (userId)
+  User, // return type
+  string, // argument type (userId)
   {
     state: RootState;
     dispatch: AppDispatch;
     rejectValue: string;
   }
->(
-  "users/fetchById",
-  async (userId: string, { rejectWithValue }) => {
-    const response = await fetch(`/api/users/${userId}`);
-    if (!response.ok) {
-      return rejectWithValue("Failed to fetch user");
-    }
-    return (await response.json()) as User;
+>("users/fetchById", async (userId: string, { rejectWithValue }) => {
+  const response = await fetch(`/api/users/${userId}`);
+  if (!response.ok) {
+    return rejectWithValue("Failed to fetch user");
   }
-);
+  return (await response.json()) as User;
+});
 ```
 
 ### Typed RTK Query
@@ -1510,7 +1552,11 @@ export const postsApi = createApi({
 
 ```js
 // counterSlice.test.js
-import counterReducer, { increment, decrement, incrementByAmount } from "./counterSlice";
+import counterReducer, {
+  increment,
+  decrement,
+  incrementByAmount,
+} from "./counterSlice";
 
 describe("counterReducer", () => {
   it("should return initial state", () => {
@@ -1654,11 +1700,11 @@ Immer creates a mutable draft proxy of your state. You write imperative mutation
 
 **Q: What is the difference between `isLoading` and `isFetching` in RTK Query?**
 
-| | `isLoading` | `isFetching` |
-|--|------------|-------------|
-| First load (no cache) | `true` | `true` |
-| Subsequent refetch (cache exists) | `false` | `true` |
-| Mutation in progress | `false` | `false` |
+|                                   | `isLoading` | `isFetching` |
+| --------------------------------- | ----------- | ------------ |
+| First load (no cache)             | `true`      | `true`       |
+| Subsequent refetch (cache exists) | `false`     | `true`       |
+| Mutation in progress              | `false`     | `false`      |
 
 Use `isLoading` to show skeleton on first load. Use `isFetching` to show a subtle refresh indicator.
 
@@ -1699,6 +1745,6 @@ Yes. Create two separate `createApi` instances with different `reducerPath` valu
 
 ---
 
-*This guide covers Redux from first principles through RTK Query advanced patterns. Practice: build a Todo app with plain Redux → migrate it to RTK → add RTK Query for server-synced todos.*
+_This guide covers Redux from first principles through RTK Query advanced patterns. Practice: build a Todo app with plain Redux → migrate it to RTK → add RTK Query for server-synced todos._
 
 {% endraw %}
